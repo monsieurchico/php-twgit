@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Php-twgit by monsieurchico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Php-twgit</h1>
+      <h2 class="project-tagline">A PHP version of the mighty Twgit</h2>
+      <a href="https://github.com/monsieurchico/php-twgit" class="btn">View on GitHub</a>
+      <a href="https://github.com/monsieurchico/php-twgit/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/monsieurchico/php-twgit/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="php-twgit" class="anchor" href="#php-twgit" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Php TwGit</h1>
+
+<h4>
+<a id="homepage" class="anchor" href="#homepage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="http://monsieurchico.github.io/php-twgit/">Homepage</a>
+</h4>
+
+<h2>
+<a id="twgit" class="anchor" href="#twgit" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>TwGit</h2>
+
+<p>Twgit is a free and open source assisting tools for managing features, hotfixes and releases on Git repositories.
+It provides simple, high-level commands to adopt the branching model describes in our documentation (see below).</p>
+
+<p>This tools is largely inspired by <a href="https://github.com/nvie/gitflow">GitFlow</a>, but the workflow is different.</p>
+
+<h2>
+<a id="php-twgit-1" class="anchor" href="#php-twgit-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Php TwGit</h2>
+
+<p>As a bash application, <strong>Twgit</strong> is not working properly on every shells of every OS. After several hours spent to make <strong>twgit</strong> fully compatible with zsh on MacOs (without success), I decided to rewrite the application in a more portable language : <strong>PHP</strong>.</p>
+
+<p><strong>Php Twgit</strong> is a <strong>Composer application</strong> base on <strong>Symfony 3 Console</strong>.</p>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h2>
+
+<ul>
+<li>PHP Cli <strong>&gt;=5.5.9</strong> with modules <strong>curl</strong> and the option <strong>phar.readonly</strong> set to <strong>Off</strong>.</li>
+<li>Git v1.7.2 <em>(2010)</em> and above</li>
+</ul>
+
+<h2>
+<a id="installing" class="anchor" href="#installing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing</h2>
+
+<h3>
+<a id="use-the-compiled-version" class="anchor" href="#use-the-compiled-version" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Use the compiled version</h3>
+
+<div class="highlight highlight-source-shell"><pre>$ wget http://monsieurchico.github.io/php-twgit/deploy/twgit.phar
+$ sudo cp twgit.phar /usr/local/bin/twgit</pre></div>
+
+<h3>
+<a id="get-source-code" class="anchor" href="#get-source-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Get source code</h3>
+
+<div class="highlight highlight-source-shell"><pre>$ git clone git@github.com:monsieurchico/php-twgit.git <span class="pl-k">~</span>/php-twgit
+$ <span class="pl-c1">cd</span> <span class="pl-k">~</span>/php-twgit
+$ sh makefile.sh
+$ sudo cp deploy/twgit.phar /usr/local/bin/twgit</pre></div>
+
+<h2>
+<a id="configuring" class="anchor" href="#configuring" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuring</h2>
+
+<p>On first execution, <strong>php-twgit</strong> will create a global configuration file : <strong>~/.twgit/config.yml</strong>.</p>
+
+<p>On first execution in your git project directory (second if the real first execution wasn't in it), <strong>php-twgit</strong> will create a project configuration file as an exact copy of the global one : <strong>./.twgit/config.yml</strong>.</p>
+
+<div class="highlight highlight-source-yaml"><pre><span class="pl-s"><span class="pl-ent">parameters:</span></span>
+    <span class="pl-s"><span class="pl-ent">command:</span> <span class="pl-s">twgit</span></span>
+
+    <span class="pl-s"><span class="pl-ent">git:</span></span>
+        <span class="pl-s"><span class="pl-ent">stable:</span> <span class="pl-s"><span class="pl-pds">'</span>master<span class="pl-pds">'</span></span></span>
+        <span class="pl-s"><span class="pl-ent">origin:</span> <span class="pl-s"><span class="pl-pds">'</span>origin<span class="pl-pds">'</span></span></span>
+
+    <span class="pl-s"><span class="pl-ent">workflow:</span></span>
+        <span class="pl-s"><span class="pl-ent">prefixes:</span> </span><span class="pl-c"># prefixes for branches</span>
+            <span class="pl-s"><span class="pl-ent">feature:</span> <span class="pl-s"><span class="pl-pds">'</span>feature-<span class="pl-pds">'</span></span></span>
+            <span class="pl-s"><span class="pl-ent">release:</span> <span class="pl-s"><span class="pl-pds">'</span>release-<span class="pl-pds">'</span></span></span>
+            <span class="pl-s"><span class="pl-ent">hotfix:</span> <span class="pl-s"><span class="pl-pds">'</span>hotfix-<span class="pl-pds">'</span></span></span>
+            <span class="pl-s"><span class="pl-ent">demo:</span> <span class="pl-s"><span class="pl-pds">'</span>demo-<span class="pl-pds">'</span></span></span>
+            <span class="pl-s"><span class="pl-ent">tag:</span> <span class="pl-s"><span class="pl-pds">'</span>v<span class="pl-pds">'</span></span></span>
+
+    <span class="pl-s"><span class="pl-ent">connectors:</span></span>
+        <span class="pl-s"><span class="pl-ent">enabled:</span> <span class="pl-s">~ </span></span><span class="pl-c"># set the connector you want to use</span>
+        <span class="pl-s"><span class="pl-ent">jira:</span></span>
+            <span class="pl-s"><span class="pl-ent">domain:</span> <span class="pl-s"><span class="pl-pds">'</span>pmdtech.atlassian.net<span class="pl-pds">'</span></span></span>
+            <span class="pl-s"><span class="pl-ent">credentials:</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span><span class="pl-s"> </span></span><span class="pl-c"># base64(concat(user:password))</span>
+        <span class="pl-s"><span class="pl-ent">redmine:</span></span>
+            <span class="pl-s"><span class="pl-ent">domain:</span> <span class="pl-s"><span class="pl-pds">'</span>www.redmine.org<span class="pl-pds">'</span></span></span>
+            <span class="pl-s"><span class="pl-ent">api_key:</span> <span class="pl-s">~ </span></span><span class="pl-c"># 40-byte hexadecimal string</span>
+        <span class="pl-s"><span class="pl-ent">gitlab:</span></span>
+            <span class="pl-s"><span class="pl-ent">domain:</span> <span class="pl-s"><span class="pl-pds">'</span>www.gitlab.com<span class="pl-pds">'</span></span></span>
+            <span class="pl-s"><span class="pl-ent">user:</span> <span class="pl-s">~</span></span>
+        <span class="pl-s"><span class="pl-ent">github:</span></span>
+            <span class="pl-s"><span class="pl-ent">repository:</span> <span class="pl-s">~</span></span>
+            <span class="pl-s"><span class="pl-ent">user:</span> <span class="pl-s">~</span></span>
+            <span class="pl-s"><span class="pl-ent">access_token:</span> <span class="pl-s">~</span></span>
+        <span class="pl-s"><span class="pl-ent">trello:</span></span>
+            <span class="pl-s"><span class="pl-ent">domain:</span> <span class="pl-s"><span class="pl-pds">'</span>trello.com<span class="pl-pds">'</span></span></span>
+            <span class="pl-s"><span class="pl-ent">application_key:</span> <span class="pl-s">~ </span></span><span class="pl-c"># check https://trello.com/docs/gettingstarted/index.html#getting-an-application-key</span>
+            <span class="pl-s"><span class="pl-ent">token:</span> <span class="pl-s">~ </span></span><span class="pl-c"># check https://trello.com/docs/gettingstarted/index.html#getting-a-token-from-a-user</span>
+
+    <span class="pl-s"><span class="pl-ent">features:</span></span>
+        <span class="pl-s"><span class="pl-ent">subject_filename:</span> <span class="pl-s"><span class="pl-pds">'</span>features_subject<span class="pl-pds">'</span></span></span>
+
+    <span class="pl-s"><span class="pl-ent">update:</span></span>
+         <span class="pl-s"><span class="pl-ent">log_filename:</span> <span class="pl-s"><span class="pl-pds">'</span>last_update<span class="pl-pds">'</span></span></span>
+         <span class="pl-c1"><span class="pl-ent">nb_days:</span> 2</span>
+         <span class="pl-s"><span class="pl-ent">auto_check:</span> <span class="pl-s">true</span></span>
+
+    <span class="pl-s"><span class="pl-ent">commit:</span></span>
+        <span class="pl-s"><span class="pl-ent">first_commit_message:</span> <span class="pl-s"><span class="pl-pds">'</span>[twgit] Init %s %s %s<span class="pl-pds">'</span></span></span></pre></div>
+
+<h2>
+<a id="workflow" class="anchor" href="#workflow" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Workflow</h2>
+
+<p>To see the available commands :</p>
+
+<div class="highlight highlight-source-shell"><pre>$ twgit</pre></div>
+
+<p>To see the availabe actions on a command :</p>
+
+<div class="highlight highlight-source-shell"><pre>$ twgit release
+$ twgit feature
+$ twgit demo ...</pre></div>
+
+<p>More documentation on the <a href="https://github.com/Twenga/twgit/wiki">Wiki</a>.</p>
+
+<h1>
+<a id="-original-twgit-links" class="anchor" href="#-original-twgit-links" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="http://twgit.twenga.com/"><img src="https://github.com/Twenga/twgit/raw/stable/doc/logo-med.png" alt="TwGit logo"></a> <a href="https://github.com/Twenga/twgit/">Original TwGit links</a>
+</h1>
+
+<p><a href="https://github.com/Twenga/twgit/">Github</a></p>
+
+<p><a href="http://twgit.twenga.com/">Homepage</a></p>
+
+<p><a href="https://github.com/Twenga/twgit/wiki">Wiki</a></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/monsieurchico/php-twgit">Php-twgit</a> is maintained by <a href="https://github.com/monsieurchico">monsieurchico</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-72753137-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
