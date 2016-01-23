@@ -92,15 +92,11 @@ class Application extends BaseApplication
     {
         $commands = parent::getDefaultCommands();
 
-        $commands = array_merge($commands, [
+        return array_merge($commands, [
             'release' => new Command\ReleaseCommand(),
             'feature' => new Command\FeatureCommand(),
+            'self-update' => new Command\SelfUpdateCommand(),
         ]);
-
-        if ('phar:' === substr(__FILE__, 0, 5) || 1 === 1) {
-            $commands['self-update'] = new Command\SelfUpdateCommand();
-        }
-        return $commands;
     }
 
     /**

@@ -199,7 +199,7 @@ class Git extends Shell
             return self::VERSION_PREVIOUS;
         }
 
-        return self::VERSION_PREVIOUS;
+        return self::VERSION_NEXT;
     }
 
     /**
