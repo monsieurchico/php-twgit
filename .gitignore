@@ -5,6 +5,8 @@ composer.lock
 app/config/config.yml
 
 vendor/
+deploy/
+build/
 
 box.phar
 composer.phar
