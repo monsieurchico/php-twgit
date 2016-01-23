@@ -12,7 +12,7 @@ This tools is largely inspired by [GitFlow](https://github.com/nvie/gitflow), bu
 
 ## Php TwGit
 
-As a bash application, **Twgit** is not working properly on every shells of every OS. After several hours spent to make **twgit** fully compatible with zsh on MacOs (without success), I decided to rewrite the application in a more portable language : **PHP**.
+As a bash application, **Twgit** is not working properly on every shells of every OS. After several hours spent to make **twgit** fully compatible with zsh on MacOs (without success), I decided to rewrite the application **PHP**.
 
 **Php Twgit** is a **Composer application** base on **Symfony 3 Console**.
 
