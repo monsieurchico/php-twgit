@@ -1,0 +1,46 @@
+parameters:
+    command: twgit
+
+    git:
+        stable: 'stable'
+        origin: 'origin'
+
+    workflow:
+        prefixes:
+            feature: 'feature-'
+            release: 'release-'
+            hotfix: 'hotfix-'
+            demo: 'demo-'
+            tag: 'v'
+
+    connectors:
+        enabled: ~
+        jira:
+            domain: 'pmdtech.atlassian.net'
+            credentials: '' # base64(concat(user:password))
+        redmine:
+            domain: 'www.redmine.org'
+            api_key: ~ # 40-byte hexadecimal string
+        gitlab:
+            domain: 'www.gitlab.com'
+            user: ~
+        github:
+            repository: ~
+            user: ~
+            access_token: ~
+        trello:
+            domain: 'trello.com'
+            application_key: ~ # check https://trello.com/docs/gettingstarted/index.html#getting-an-application-key
+            token: ~ # check https://trello.com/docs/gettingstarted/index.html#getting-a-token-from-a-user
+
+    features:
+        subject_filename: '.twgit_features_subject'
+
+    update:
+         log_filename: '.lastupdate'
+         nb_days: 2
+         auto_check: true
+
+    commit:
+        first_commit_message: '[twgit] Init %s %s %s'
+

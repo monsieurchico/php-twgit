@@ -1,0 +1,17 @@
+{
+    "algorithm": "SHA256",
+    "directories": ["app", "src", "vendor"],
+    "blacklist": [
+        "build.sh",
+        "box.phar",
+        "box.json",
+        "composer.json",
+        "composer.phar"
+    ],
+    "compression": "BZ2",
+    "chmod": "0755",
+    "extract": false,
+    "stub": true,
+    "output": "twgit.phar",
+    "main": "bin/console"
+}
