@@ -1,0 +1,10 @@
+.idea/
+composer.lock
+vendor/
+box.phar
+twgit.phar
+twgit
+.twgit
+composer.phar
+app/config/config.yml
+deploy/
