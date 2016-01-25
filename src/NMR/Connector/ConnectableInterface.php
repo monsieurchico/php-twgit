@@ -10,12 +10,11 @@ namespace NMR\Connector;
 interface ConnectableInterface
 {
     /**
-     * @param string $project
      * @param string $version
      *
-     * @return bool
+     * @return mixed
      */
-    function createProjectVersion($project, $version);
+    function createProjectVersion($version);
 
     /**
      * @param string $issue
