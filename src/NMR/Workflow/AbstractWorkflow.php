@@ -4,6 +4,7 @@ namespace NMR\Workflow;
 
 use NMR\Config\Config;
 use NMR\Connector\ConnectorAwareTrait;
+use NMR\Connector\NullConnector;
 use NMR\Shell\Git\GitAwareTrait;
 use NMR\Shell\ShellAwareTrait;
 use NMR\Exception\ConfigurationException;
@@ -79,6 +80,7 @@ abstract class AbstractWorkflow
 
         $this->firstCommitMessage = $config->get('twgit.commit.first_commit_message', '[twgit] Init %s %s %s');
         $this->featuresSubjectFilename = $config->get('twgit.features.subject_filename', '.twgit_features_subject');
+        $this->setConnector(new NullConnector());
     }
 
     /**

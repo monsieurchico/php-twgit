@@ -38,15 +38,16 @@ class FeatureCommand extends Command
 <wb>    twgit feature [<action>]</>
 
 <cb>(i)</> <c>Availabe commands are:</>
-    <wb>start [<featurename] [-M|-m]
-            Create both a new local and remote feature, or fetch the remote feature, or checkout the local feature.
-            <featurename> must use major.minor.revision format.
-            If no <featurename> is specified, a name will be generated buy incrementing the last tag (e.g. v1.2.3):
-                -M for a new major version (-> {$prefixFeature}2.0.0)
-                -m for a new minor version (-> {$prefixFeature}1.3.0)
+    <wb>merge-into-release [<featurename]</>
+        Try to merge specified feature into current release.
+        If no <featurename> is specified, then ask to use current feature.
 
-    Prefix '{$prefixFeature}' will be added to <featurename> parameters.
-    Prefix 'v' will be added to <tagname> parameters.
+    <wb>start [<featurename] [-d]</>
+        Create both a new local and remote feature, of tech the remote feature, or checkout the local feature.
+        Add -d to delete beforehand local feature if exists.
+
+
+    Prefix '{$prefixFeature}' will be added to <featurename> and <newfeaturename> parameters.
 EOT
         );
     }
