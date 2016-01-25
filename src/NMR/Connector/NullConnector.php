@@ -13,7 +13,7 @@ class NullConnector extends AbstractConnector
      *
      * @return bool
      */
-    public function createProjectVersion($project, $version)
+    public function createProjectVersion($version)
     {
         return true;
     }
