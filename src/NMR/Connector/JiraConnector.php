@@ -12,33 +12,38 @@ class JiraConnector extends AbstractConnector
     protected $domain;
 
     /** @var string */
+    protected $project;
+
+    /** @var string */
     protected $credentials;
 
     /**
      * JiraConnector constructor.
      *
      * @param string $domain
+     * @param string $project
      * @param string $credentials
      */
-    public function __construct($domain, $credentials)
+    public function __construct($domain, $project, $credentials)
     {
         $this->domain = $domain;
+        $this->project = $project;
         $this->credentials = $credentials;
     }
 
+
     /**
-     * @param string $project
      * @param string $version
      *
      * @return bool
      */
-    public function createProjectVersion($project, $version)
+    public function createProjectVersion($version)
     {
         $response = $this->getClient()->request(
             'post',
             sprintf(
-                'https://%s/rest/api/latest/project/%s/version',
-                $this->domain, $project
+                'https://%s/rest/api/latest/%s/%s/version',
+                $this->domain, $this->project
             ),
             array_merge(
                 $this->getDefaultClientOptions(),
