@@ -28,7 +28,7 @@ As a bash application, **Twgit** is not working properly on every shells of ever
 ```bash
 $ wget http://monsieurchico.github.io/php-twgit/deploy/twgit.phar
 $ sudo cp twgit.phar /usr/local/bin/twgit
-$ sudo chmox +x /usr/local/bin/twgit
+$ sudo chmod +x /usr/local/bin/twgit
 ```
 
 ### Get source code
@@ -38,7 +38,7 @@ $ git clone git@github.com:monsieurchico/php-twgit.git ~/php-twgit
 $ cd ~/php-twgit
 $ sh makefile.sh
 $ sudo cp deploy/twgit.phar /usr/local/bin/twgit
-$ sudo chmox +x /usr/local/bin/twgit
+$ sudo chmod +x /usr/local/bin/twgit
 ```
 
 ## Configuring
