@@ -8,6 +8,12 @@ use GuzzleHttp\Psr7\Request;
  */
 class JiraConnector extends AbstractConnector
 {
+    const
+        URL_TYPE_ISSUES = 'issue',
+        URL_TYPE_PROJECTS = 'project',
+        URL_TYPE_VERSIONS = 'version'
+    ;
+
     /** @var string */
     protected $domain;
 
@@ -39,28 +45,25 @@ class JiraConnector extends AbstractConnector
      */
     public function createProjectVersion($version)
     {
-        $response = $this->getClient()->request(
-            'post',
-            sprintf(
-                'https://%s/rest/api/latest/%s/%s/version',
-                $this->domain, $this->project
-            ),
+        if ($this->getProjectVersion($version)) {
+            return true;
+        }
+
+        $response = $this->getClient()->post(
+            $this->getUrl(self::URL_TYPE_VERSIONS),
             array_merge(
                 $this->getDefaultClientOptions(),
                 [
-                    'headers' => [
-                        'application/json'
-                    ],
-                    'form_params' => [
+                    'json' => [
                         'name' => $version,
-                        'project' => $project,
+                        'project' => $this->project,
                         'released' => false
                     ]
                 ]
             )
         );
 
-        return 200 === $response->getStatusCode();
+        return self::HTTP_STATUS_OK === $response->getStatusCode();
     }
 
     /**
@@ -71,11 +74,11 @@ class JiraConnector extends AbstractConnector
     public function getIssueTitle($issue)
     {
         $response = $this->getClient()->get(
-            $this->getDefaultIssueUrl($issue),
+            $this->getUrl(self::URL_TYPE_ISSUES, $issue),
             $this->getDefaultClientOptions()
         );
 
-        if (200 === $response->getStatusCode()) {
+        if (self::HTTP_STATUS_OK === $response->getStatusCode()) {
             $parameters = json_decode($response->getBody(), true);
 
             return $parameters['fields']['summary'];
@@ -85,24 +88,70 @@ class JiraConnector extends AbstractConnector
     }
 
     /**
+     * @return array|null
+     */
+    protected function getProjectVersions()
+    {
+        // check if version is available
+        $response = $this->getClient()->get(
+            sprintf('%s/versions', $this->getUrl(self::URL_TYPE_PROJECTS, $this->project)),
+            $this->getDefaultClientOptions()
+        );
+
+        if (self::HTTP_STATUS_OK === $response->getStatusCode()) {
+            return json_decode($response->getBody()->getContents(), true);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $version
+     *
+     * @return array|null
+     */
+    protected function getProjectVersion($version)
+    {
+        $foundVersionInfo = null;
+        $versions = $this->getProjectVersions();
+
+        if (!empty($versions)) {
+            foreach ($versions as $versionInfo) {
+                if ($versionInfo['name'] === $version) {
+                    $foundVersionInfo = $versionInfo;
+                    break;
+                }
+            }
+        }
+
+        return $foundVersionInfo;
+    }
+
+    /**
      * @param string $issue
      * @param string $version
      */
     public function setIssueFixVersion($issue, $version)
     {
-        $response = $this->getClient()->request(
-            'post',
-            $this->getDefaultIssueUrl($issue) . '/editmeta',
+        if (!$this->getProjectVersion($version)) {
+            $this->createProjectVersion($version);
+        }
+
+        $response = $this->getClient()->put(
+            $this->getUrl(self::URL_TYPE_ISSUES, $issue),
             array_merge(
                 $this->getDefaultClientOptions(),
                 [
-                    'headers' => [
-                        'application/json'
-                    ],
-                    'form_params' => [
+                    'json' => [
                         'update' => [
-                            'fixVersion' => [
-                                'set' => $version
+                            'fixVersions' => [
+                                [
+                                    'set' => [
+                                        [
+                                            'name' => $version
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ]
@@ -110,20 +159,29 @@ class JiraConnector extends AbstractConnector
             )
         );
 
-        return 200 === $response->getStatusCode();
+        return
+            self::HTTP_STATUS_NO_CONTENT === $response->getStatusCode() ||
+            self::HTTP_STATUS_OK === $response->getStatusCode();
     }
 
     /**
-     * @param $issue
+     * @param string $type
+     * @param string $number
      *
      * @return string
      */
-    protected function getDefaultIssueUrl($issue)
+    protected function getUrl($type, $number = null)
     {
-        return sprintf(
-            'https://%s/rest/api/latest/issue/%s',
-            $this->domain, $issue
+        $url = sprintf(
+            'https://%s/rest/api/latest/%s',
+            $this->domain, $type
         );
+
+        if ($number) {
+            return sprintf('%s/%s', $url, $number);
+        }
+
+        return $url;
     }
 
     /**
@@ -137,6 +195,9 @@ class JiraConnector extends AbstractConnector
         return [
             'auth' => [$user, $password, 'basic'],
             'http_errors' => false,
+            'headers' => [
+                'application/json'
+            ],
         ];
     }
 }

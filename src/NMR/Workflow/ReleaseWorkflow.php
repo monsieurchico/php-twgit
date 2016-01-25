@@ -78,6 +78,8 @@ class ReleaseWorkflow extends AbstractWorkflow
         }
 
         $this->alertOldBranch($release);
+
+        $this->getConnector()->createProjectVersion($version);
     }
 
     /**
