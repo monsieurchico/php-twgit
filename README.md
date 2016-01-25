@@ -28,6 +28,7 @@ As a bash application, **Twgit** is not working properly on every shells of ever
 ```bash
 $ wget http://monsieurchico.github.io/php-twgit/deploy/twgit.phar
 $ sudo cp twgit.phar /usr/local/bin/twgit
+$ sudo chmox +x /usr/local/bin/twgit
 ```
 
 ### Get source code
@@ -37,6 +38,7 @@ $ git clone git@github.com:monsieurchico/php-twgit.git ~/php-twgit
 $ cd ~/php-twgit
 $ sh makefile.sh
 $ sudo cp deploy/twgit.phar /usr/local/bin/twgit
+$ sudo chmox +x /usr/local/bin/twgit
 ```
 
 ## Configuring
@@ -54,7 +56,7 @@ parameters:
         origin: 'origin'
 
     workflow:
-        prefixes: # prefixes for branches
+        prefixes:
             feature: 'feature-'
             release: 'release-'
             hotfix: 'hotfix-'
@@ -62,9 +64,10 @@ parameters:
             tag: 'v'
 
     connectors:
-        enabled: ~ # set the connector you want to use
+        enabled: ~
         jira:
-            domain: 'pmdtech.atlassian.net'
+            domain: '' # ex jira.atlassian.net
+            project: '' # php-git
             credentials: '' # base64(concat(user:password))
         redmine:
             domain: 'www.redmine.org'
@@ -82,15 +85,16 @@ parameters:
             token: ~ # check https://trello.com/docs/gettingstarted/index.html#getting-a-token-from-a-user
 
     features:
-        subject_filename: 'features_subject'
+        subject_filename: 'twgit_features_subject'
 
     update:
-         log_filename: 'last_update'
+         log_filename: 'lastupdate'
          nb_days: 2
          auto_check: true
 
     commit:
         first_commit_message: '[twgit] Init %s %s %s'
+
 ```
 
 ## Workflow

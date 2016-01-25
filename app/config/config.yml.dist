@@ -2,7 +2,7 @@ parameters:
     command: twgit
 
     git:
-        stable: 'stable'
+        stable: 'master'
         origin: 'origin'
 
     workflow:
@@ -16,7 +16,8 @@ parameters:
     connectors:
         enabled: ~
         jira:
-            domain: 'pmdtech.atlassian.net'
+            domain: '' # ex jira.atlassian.net
+            project: '' # php-git
             credentials: '' # base64(concat(user:password))
         redmine:
             domain: 'www.redmine.org'
@@ -34,10 +35,10 @@ parameters:
             token: ~ # check https://trello.com/docs/gettingstarted/index.html#getting-a-token-from-a-user
 
     features:
-        subject_filename: '.twgit_features_subject'
+        subject_filename: 'twgit_features_subject'
 
     update:
-         log_filename: '.lastupdate'
+         log_filename: 'lastupdate'
          nb_days: 2
          auto_check: true
 
