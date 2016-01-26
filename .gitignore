@@ -1,5 +1,5 @@
 .idea/
-.twgit
+.twgit/.twgit_features_subject
 
 composer.lock
 app/config/config.yml
