@@ -16,6 +16,7 @@ use NMR\Exception\ConfigurationException;
 use NMR\Exception\ShellException;
 use NMR\Exception\WorkflowException;
 use NMR\Log\LoggerAwareTrait;
+use NMR\Util\TextUtil;
 
 /**
  * Class AbstractWorkflow
@@ -573,8 +574,8 @@ EOT
         $remoteBranch = sprintf('%s/%s', $this->origin, $branch);
 
         $this->assertValidRefName($branch);
-        $this->assertCleanWorkingTree();
-        $this->processFetch();
+        #$this->assertCleanWorkingTree();
+        #$this->processFetch();
 
         if ($deleteLocal) {
             if ($this->branchExists($branch)) {
@@ -877,16 +878,19 @@ EOT
         $issue = $this->cleanPrefix($branch, self::FEATURE);
 
         if (file_exists($this->getFeaturesSubjectPath())) {
-            $subject = $this->execShellCommand([
-                'cat', $this->getFeaturesSubjectPath(),
-                '|', sprintf('grep -E "^%s;"', $issue),
-                '|', 'head -n 1',
-                '|', "sed 's/^[^;]*;//'"
-            ], true)->getOutputLastLine();
+            $content = explode("\n", file_get_contents($this->getFeaturesSubjectPath()));
+            foreach ($content as $info) {
+                $logIssue = substr($info, 0, strpos($info, ';'));
+                $logTitle = TextUtil::sanitize(substr($info, strpos($info, ';') + 1));
+
+                if ($logIssue === $issue) {
+                    return $logTitle;
+                }
+            }
         }
 
         if (empty($subject) && $this->getConnector()) {
-            $subject = $this->getConnector()->getIssueTitle($issue);
+            $subject = TextUtil::sanitize($this->getConnector()->getIssueTitle($issue));
             file_put_contents($this->getFeaturesSubjectPath(), sprintf('%s;%s', $issue, $subject) . "\n", FILE_APPEND);
         }
 

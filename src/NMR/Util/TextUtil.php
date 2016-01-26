@@ -33,4 +33,14 @@ class TextUtil
             return sprintf('%s%s', $separator, strtolower($matches[1]));
         }, $string);
     }
+
+    /**
+     * @param $string
+     *
+     * @return string
+     */
+    public static function sanitize($string)
+    {
+        return str_replace(['"', "'", '/', '\\'], '', $string);
+    }
 }

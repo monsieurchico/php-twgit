@@ -1,0 +1,16 @@
+parameters:
+    git:
+        stable: 'master'
+        origin: 'origin'
+
+    workflow:
+        prefixes:
+            feature: 'feature-'
+            release: 'release-'
+            hotfix: 'hotfix-'
+            demo: 'demo-'
+            tag: ''
+
+    connectors:
+        enabled: 'github'
+
