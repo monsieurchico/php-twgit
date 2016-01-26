@@ -148,7 +148,7 @@ class HotfixWorkflow extends AbstractWorkflow
             ], false, sprintf('Could not check out hotfix "%s".', $remoteHotfix));
         }
 
-        $tag = $this->cleanPrefix($currentHotfix, self::TAG);
+        $tag = $this->cleanPrefix($currentHotfix, self::HOTFIX);
         $this->assertNewAndValidTagName($tag);
 
         $this->assertCleanStableBranchAndCheckout();
