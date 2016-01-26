@@ -76,8 +76,6 @@ class Git extends Shell
         $response = $this->execSilentCommand($this->buildCommand([
             'git branch --no-color',
             $remote ? '-r' : '',
-            '|', "sed 's/^[* ] //'",
-            '|', "grep -v HEAD",
         ]));
 
         if ($response->getReturnCode()) {
@@ -87,7 +85,15 @@ class Git extends Shell
             ));
         }
 
-        return $response->getOutput();
+        $list = [];
+        foreach ($response->getOutput() as $branch) {
+            $branch = trim($branch, ' *');
+            if (false === strpos($branch, 'HEAD')) {
+                $list[] = $branch;
+            }
+        }
+
+        return $list;
     }
 
     /**

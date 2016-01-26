@@ -126,17 +126,19 @@ class HotfixWorkflow extends AbstractWorkflow
         $this->assertCleanWorkingTree();
         $this->processFetch();
 
-        $this->getLogger()->processing('Check rmote hotfix...');
+        $this->getLogger()->processing('Check remote hotfix...');
         $hotfixes = $this->getHotfixesInProgress();
 
         if (empty($hotfixes)) {
             throw new WorkflowException('No hotfix in progress.');
+        } elseif (count($hotfixes) > 1) {
+            throw new WorkflowException('Multiple hotfixes found : remove useless ones.');
         }
 
-        $currentHotfix = current($hotfixes);
-        $remoteHotfix = sprintf('%s/%s', $this->origin, $currentHotfix);
-        $this->getLogger()->processing(sprintf('Remote hotfix "%s" detected.', $hotfixes));
-        $this->getLogger()->processing(sprintf('Check local branch "%s"....', $hotfixes));
+        $remoteHotfix = current($hotfixes);
+        $currentHotfix = $this->cleanPrefix($remoteHotfix, self::ORIGIN);
+        $this->getLogger()->processing(sprintf('Remote hotfix "%s" detected.', $currentHotfix));
+        $this->getLogger()->processing(sprintf('Check local branch "%s"....', $currentHotfix));
 
         if ($this->branchExists($currentHotfix, false)) {
             $this->assertBranchesEqual($currentHotfix, $remoteHotfix);
@@ -146,7 +148,7 @@ class HotfixWorkflow extends AbstractWorkflow
             ], false, sprintf('Could not check out hotfix "%s".', $remoteHotfix));
         }
 
-        $tag = $this->cleanPrefix($currentHotfix, self::TAG);
+        $tag = $this->cleanPrefix($currentHotfix, self::HOTFIX);
         $this->assertNewAndValidTagName($tag);
 
         $this->assertCleanStableBranchAndCheckout();

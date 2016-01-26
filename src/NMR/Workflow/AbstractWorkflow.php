@@ -30,7 +30,8 @@ abstract class AbstractWorkflow
         FEATURE = 'feature',
         RELEASE = 'release',
         HOTFIX = 'hotfix',
-        DEMO = 'demo'
+        DEMO = 'demo',
+        ORIGIN = 'origin'
     ;
 
     /** @var array */
@@ -75,7 +76,8 @@ abstract class AbstractWorkflow
             self::RELEASE => $config->get('twgit.workflow.prefixes.release', 'release-'),
             self::HOTFIX => $config->get('twgit.workflow.prefixes.hotfix', 'hotfix-'),
             self::DEMO => $config->get('twgit.workflow.prefixes.demo', 'demo-'),
-            self::TAG => $config->get('twgit.workflow.prefixes.tag', 'v')
+            self::TAG => $config->get('twgit.workflow.prefixes.tag', 'v'),
+            self::ORIGIN => $this->origin . '/',
         ];
 
         $this->firstCommitMessage = $config->get('twgit.commit.first_commit_message', '[twgit] Init %s %s %s');

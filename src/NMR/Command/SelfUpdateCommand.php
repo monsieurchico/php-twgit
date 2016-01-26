@@ -42,7 +42,7 @@ class SelfUpdateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $currentRevision = explode('-', $this->getConfig()->get('twgit.protected.revision'))[0];
-        $distantRevision = explode('-', str_replace("\n", '', file_get_contents(self::REMOTE_URL_REVISION_INFO)))[0];
+        $distantRevision = explode('-', str_replace("\n", '', file_get_contents(self::REMOTE_URL_REVISION_INFO . '?c=' . time())))[0];
 
         $this->getLogger()->help(sprintf(
             'Current revision is "%s" and remote revision "%s".',
