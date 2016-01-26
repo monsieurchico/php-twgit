@@ -123,20 +123,22 @@ class HotfixWorkflow extends AbstractWorkflow
      */
     public function finishAction(InputInterface $input)
     {
-        $this->assertCleanWorkingTree();
-        $this->processFetch();
+        #$this->assertCleanWorkingTree();
+        #$this->processFetch();
 
-        $this->getLogger()->processing('Check rmote hotfix...');
+        $this->getLogger()->processing('Check remote hotfix...');
         $hotfixes = $this->getHotfixesInProgress();
 
         if (empty($hotfixes)) {
             throw new WorkflowException('No hotfix in progress.');
+        } elseif (count($hotfixes) > 1) {
+            throw new WorkflowException('Multiple hotfixes found : remove useless ones.');
         }
 
         $currentHotfix = current($hotfixes);
-        $remoteHotfix = sprintf('%s/%s', $this->origin, $currentHotfix);
-        $this->getLogger()->processing(sprintf('Remote hotfix "%s" detected.', $hotfixes));
-        $this->getLogger()->processing(sprintf('Check local branch "%s"....', $hotfixes));
+        $remoteHotfix = $currentHotfix;
+        $this->getLogger()->processing(sprintf('Remote hotfix "%s" detected.', $currentHotfix));
+        $this->getLogger()->processing(sprintf('Check local branch "%s"....', $currentHotfix));
 
         if ($this->branchExists($currentHotfix, false)) {
             $this->assertBranchesEqual($currentHotfix, $remoteHotfix);
