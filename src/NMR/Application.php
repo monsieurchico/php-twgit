@@ -90,14 +90,12 @@ class Application extends BaseApplication
      */
     protected function getDefaultCommands()
     {
-        $commands = parent::getDefaultCommands();
-
-        return array_merge($commands, [
+        return [
             'release' => new Command\ReleaseCommand(),
             'hotfix' => new Command\HotfixCommand(),
             'feature' => new Command\FeatureCommand(),
             'self-update' => new Command\SelfUpdateCommand(),
-        ]);
+        ];
     }
 
     /**
@@ -160,7 +158,9 @@ class Application extends BaseApplication
         try {
             $this->command = $this->get($command);
         } catch (\Exception $ex) {
-            $this->getLogger()->error(sprintf('Unknown command "%s".', $command));
+            if (!empty($command)) {
+                $this->getLogger()->error(sprintf('Unknown command "%s".', $command));
+            }
             $this->showUsage();
             exit(1);
         }
@@ -191,6 +191,7 @@ class Application extends BaseApplication
 
 <cb>(i)</> <c>Availabe commands are:</>
     <wb>release</>         Manage your release branches.
+    <wb>hotfix</>          Manage your hotfix branches.
     <wb>feature</>         Manage your feature branches.
     <wb>self-update</>     Update the version of twgit.
 
