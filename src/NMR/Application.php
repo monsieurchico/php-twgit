@@ -94,6 +94,7 @@ class Application extends BaseApplication
 
         return array_merge($commands, [
             'release' => new Command\ReleaseCommand(),
+            'hotfix' => new Command\HotfixCommand(),
             'feature' => new Command\FeatureCommand(),
             'self-update' => new Command\SelfUpdateCommand(),
         ]);
@@ -159,6 +160,7 @@ class Application extends BaseApplication
         try {
             $this->command = $this->get($command);
         } catch (\Exception $ex) {
+            $this->getLogger()->error(sprintf('Unknown command "%s".', $command));
             $this->showUsage();
             exit(1);
         }

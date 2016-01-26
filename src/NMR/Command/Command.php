@@ -7,6 +7,7 @@ use NMR\Client\GuzzleHttpClientAwareTrait;
 use NMR\Config\ConfigAwareTrait;
 use NMR\Connector\ConnectorFactory;
 use NMR\Exception\ConfigurationException;
+use NMR\Exception\WorkflowException;
 use NMR\Log\LoggerAwareTrait;
 use NMR\Shell\Git\Git;
 use NMR\Shell\Git\GitAwareTrait;
@@ -100,10 +101,8 @@ abstract class Command extends BaseCommand
 
             if ($ex instanceOf ConfigurationException) {
                 $this->showUsage();
-            }
-
-            if ($ex instanceOf WorkflowException && $ex->getGitExitCommand()) {
-                $response = $this->getGit()->runCommand($ex->getGitExitCommand());
+            } elseif ($ex instanceOf WorkflowException && $ex->getGitExitCommand()) {
+                $response = $this->getGit()->execCommand($ex->getGitExitCommand());
                 $this->getLogger()->writeln($response->getOutput());
             }
 
