@@ -123,8 +123,8 @@ class HotfixWorkflow extends AbstractWorkflow
      */
     public function finishAction(InputInterface $input)
     {
-        #$this->assertCleanWorkingTree();
-        #$this->processFetch();
+        $this->assertCleanWorkingTree();
+        $this->processFetch();
 
         $this->getLogger()->processing('Check remote hotfix...');
         $hotfixes = $this->getHotfixesInProgress();
@@ -135,8 +135,8 @@ class HotfixWorkflow extends AbstractWorkflow
             throw new WorkflowException('Multiple hotfixes found : remove useless ones.');
         }
 
-        $currentHotfix = current($hotfixes);
-        $remoteHotfix = $currentHotfix;
+        $remoteHotfix = current($hotfixes);
+        $currentHotfix = $this->cleanPrefix($remoteHotfix, self::ORIGIN);
         $this->getLogger()->processing(sprintf('Remote hotfix "%s" detected.', $currentHotfix));
         $this->getLogger()->processing(sprintf('Check local branch "%s"....', $currentHotfix));
 
