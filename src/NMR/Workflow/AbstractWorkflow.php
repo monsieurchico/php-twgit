@@ -5,6 +5,11 @@ namespace NMR\Workflow;
 use NMR\Config\Config;
 use NMR\Connector\ConnectorAwareTrait;
 use NMR\Connector\NullConnector;
+use NMR\Shell\Git\Filter\BranchNameFilter;
+use NMR\Shell\Git\Filter\MergedBranchFilter;
+use NMR\Shell\Git\Filter\NoMergedBranchFilter;
+use NMR\Shell\Git\Filter\RemoteBranchFilter;
+use NMR\Shell\Git\Git;
 use NMR\Shell\Git\GitAwareTrait;
 use NMR\Shell\ShellAwareTrait;
 use NMR\Exception\ConfigurationException;
@@ -668,11 +673,12 @@ EOT
         $remoteStable = sprintf('%s/%s', $this->origin, $this->stable);
         $remoteReleasePrefix = sprintf('%s/%s', $this->origin, $this->prefixes[self::RELEASE]);
 
-        return $this->execGitCommand([
-            'branch --no-color -r --no-merged', $remoteStable,
-            '|', sprintf("grep '%s'", $remoteReleasePrefix),
-            '|', "sed 's/^[* ]*//'"
-        ], true)->getOutput();
+        return $this->getGit()->getBranches([
+            new NoMergedBranchFilter($remoteStable),
+            new RemoteBranchFilter($remoteReleasePrefix)
+        ], [
+            new BranchNameFilter($remoteReleasePrefix)
+        ]);
     }
 
     /**
@@ -1105,10 +1111,10 @@ EOT
      */
     protected function getMergedBranches($branch)
     {
-        return $this->execGitCommand([
-            'branch --no-color -r --merged', $branch, '2>/dev/null',
-            '|', "sed 's/^[* ]*//'"
-        ], false)->getOutput();
+        return $this->getGit()->getBranches([
+            new MergedBranchFilter($branch),
+            new RemoteBranchFilter(),
+        ]);
     }
 
     /**

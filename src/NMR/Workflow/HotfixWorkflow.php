@@ -159,8 +159,8 @@ class HotfixWorkflow extends AbstractWorkflow
 
         $this->createAndPushTag($tag, sprintf('Hotfix finish: %s', $currentHotfix));
 
-        $this->removeLocalBranch($currentRelease);
-        $this->removeRemoteBranch($currentRelease);
+        $this->removeLocalBranch($currentHotfix);
+        $this->removeRemoteBranch($currentHotfix);
 
         $currentRelease = $this->getCurrentReleaseInProgress();
 
