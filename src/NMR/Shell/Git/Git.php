@@ -2,10 +2,14 @@
 
 namespace NMR\Shell\Git;
 
-use NMR\Shell\Response;
-use NMR\Shell\Shell;
 use NMR\Exception\ConfigurationException;
 use NMR\Exception\ShellException;
+use NMR\Shell\Git\Filter\FilterableInterface;
+use NMR\Shell\Git\Filter\PostFilterableInterface;
+use NMR\Shell\Git\Filter\PreFilterableInterface;
+use NMR\Shell\Git\Filter\RemoteBranchFilter;
+use NMR\Shell\Response;
+use NMR\Shell\Shell;
 
 /**
  * Class Git
@@ -15,7 +19,8 @@ class Git extends Shell
     const
         VERSION_EQUALS = 0,
         VERSION_PREVIOUS = 1,
-        VERSION_NEXT = 2;
+        VERSION_NEXT = 2
+    ;
 
     /**
      * @return string
@@ -46,6 +51,44 @@ class Git extends Shell
         return end($tags);
     }
 
+
+    public function getBranches(array $preFilters = [], array $postFilters = [])
+    {
+        $command = $this->buildCommand(['branch --no-color']);
+
+        foreach ($preFilters as $filter) {
+            if ($filter instanceOf PreFilterableInterface) {
+                $command .= ' ' . $filter->toString();
+            }
+        }
+
+        $response = $this->execSilentCommand($command);
+
+        if ($response->getReturnCode()) {
+            throw new ShellException(sprintf(
+                'Failed to retrieve %s branches.',
+                $remote ? 'remote' : 'local'
+            ));
+        }
+
+        $branches = $response->getOutput();
+
+        foreach ($branches as $index => & $branch) {
+            $branch = trim($branch, ' *');
+            if (false !== strpos($branch, 'HEAD')) {
+                unset($branches[$index]);
+            }
+        }
+
+        foreach ($postFilters as $filter) {
+            if ($filter instanceOf PostFilterableInterface) {
+                $filter->apply($branches);
+            }
+        }
+
+        return $branches;
+    }
+
     /**
      * @return array
      * @throws ShellException
@@ -66,43 +109,12 @@ class Git extends Shell
     }
 
     /**
-     * @param bool|false $remote
-     *
-     * @return array
-     * @throws ShellException
-     */
-    public function getBranches($remote = false)
-    {
-        $response = $this->execSilentCommand($this->buildCommand([
-            'git branch --no-color',
-            $remote ? '-r' : '',
-        ]));
-
-        if ($response->getReturnCode()) {
-            throw new ShellException(sprintf(
-                'Failed to retrieve %s branches.',
-                $remote ? 'remote' : 'local'
-            ));
-        }
-
-        $list = [];
-        foreach ($response->getOutput() as $branch) {
-            $branch = trim($branch, ' *');
-            if (false === strpos($branch, 'HEAD')) {
-                $list[] = $branch;
-            }
-        }
-
-        return $list;
-    }
-
-    /**
      * @return array
      * @throws ShellException
      */
     public function getLocalBranches()
     {
-        return $this->getBranches(false);
+        return $this->getBranches();
     }
 
     /**
@@ -111,7 +123,7 @@ class Git extends Shell
      */
     public function getRemoteBranches()
     {
-        return $this->getBranches(true);
+        return $this->getBranches([new RemoteBranchFilter()]);
     }
 
     /**
