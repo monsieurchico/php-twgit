@@ -1,6 +1,5 @@
 .idea/
 .twgit/
-
 composer.lock
 app/config/config.yml
 

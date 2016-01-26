@@ -84,12 +84,13 @@ class Application extends BaseApplication
     protected function getDefaultCommands()
     {
         return [
-            'release' => new Command\ReleaseCommand(),
-            'hotfix' => new Command\HotfixCommand(),
-            'feature' => new Command\FeatureCommand(),
-            'init' => new Command\InitCommand(),
-            'self-update' => new Command\SelfUpdateCommand(),
-            'help' => new Command\HelpCommand(),
+            'release'       => new Command\ReleaseCommand(),
+            'hotfix'        => new Command\HotfixCommand(),
+            'feature'       => new Command\FeatureCommand(),
+            'init'          => new Command\InitCommand(),
+            'self-update'   => new Command\SelfUpdateCommand(),
+            'help'          => new Command\HelpCommand(),
+            'demo'          => new Command\DemoCommand()
         ];
     }
 

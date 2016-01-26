@@ -61,8 +61,8 @@ abstract class Command extends BaseCommand
     protected function configure()
     {
         $this
-            ->addArgument('command', InputArgument::REQUIRED, 'Command')
-            ->addArgument('action', InputArgument::OPTIONAL, 'Action')
+            ->addArgument('instruction', InputArgument::REQUIRED, 'Command')
+            ->addArgument('action', InputArgument::REQUIRED, 'Action')
             ->addOption('silent', 's', InputOption::VALUE_NONE, 'Disable interactive mode')
         ;
     }
