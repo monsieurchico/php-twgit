@@ -60,7 +60,7 @@ class HotfixCommand extends Command
                 v1.2.3 => hotfix/1.2.4
             Add -s to run in nointeractive mode (always say yes).
 
-    Prefix '{$prefixRelease}' will be added to <hotfixname> parameters.
+    Prefix '{$prefixHotfix}' will be added to <hotfixname> parameters.
 
 EOT
         );
