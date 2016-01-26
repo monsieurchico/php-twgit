@@ -681,11 +681,38 @@ EOT
         $remoteStable = sprintf('%s/%s', $this->origin, $this->stable);
         $remoteReleasePrefix = sprintf('%s/%s', $this->origin, $this->prefixes[self::HOTFIX]);
 
-        return $this->execGitCommand([
-            'branch --no-color -r --no-merged', $remoteStable,
-            '|', sprintf("grep '%s'", $remoteReleasePrefix),
-            '|', "sed 's/^[* ]*//'"
-        ], true)->getOutput();
+        $list = [];
+        foreach ($this->execGitCommand(['branch --no-color -r --no-merged', $remoteStable], true)->getOutput() as $remoteBranch) {
+            $remoteBranch = trim($remoteBranch);
+            if (0 === strpos($remoteBranch, $remoteReleasePrefix)) {
+                $list[] = $remoteBranch;
+            }
+        }
+
+        if (count($list) > 1) {
+            throw new WorkflowException('One or more hotfixes are in progress. Please, clean !');
+        }
+
+        return $list;
+    }
+
+    /**
+     * @return mixed
+     * @throws ConfigurationException
+     */
+    protected function getCurrentHotfixInProgress()
+    {
+        $hotfixes = $this->getHotfixesInProgress();
+
+        foreach ($hotfixes as $index => $hotfix) {
+            $hotfixes[$index] = preg_replace(sprintf('@^%s/@', $this->origin), '', $hotfix);
+        }
+
+        if (count($hotfixes) > 1) {
+            throw new ConfigurationException(sprintf('More than one hotfix in progress detected: <error_bold>%s</>.', implode(', ', $hotfixes)));
+        }
+
+        return current($hotfixes);
     }
 
 
@@ -1079,7 +1106,7 @@ EOT
         return $this->execGitCommand([
             'branch --no-color -r --merged', $branch, '2>/dev/null',
             '|', "sed 's/^[* ]*//'"
-        ], true)->getOutput();
+        ], false)->getOutput();
     }
 
     /**
