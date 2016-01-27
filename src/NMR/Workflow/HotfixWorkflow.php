@@ -67,6 +67,8 @@ class HotfixWorkflow extends AbstractWorkflow
             $this->execGitCommand([
                 'checkout --track -b', $hotfix, $remoteHotfix
             ], false, sprintf('Could not check out release "%s".', $remoteHotfix));
+
+            $version = $this->cleanPrefix($hotfix, self::HOTFIX);
         }
 
         $this->getConnector()->createProjectVersion($version);
