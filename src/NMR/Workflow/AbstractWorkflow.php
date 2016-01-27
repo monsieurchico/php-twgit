@@ -800,17 +800,17 @@ EOT
             $list = $this->execGitCommand([
                 'branch --no-color -r',
                 '|', "sed 's/^[* ]*//'",
-            ], false)->getOutput();
+            ], true)->getOutput();
         } elseif ('merged' === $type && !empty($release)) {
             $list = $this->execGitCommand([
                 'branch --no-color -r --merged', $release, '2>/dev/null',
                 '|', "sed 's/^[* ]*//'",
-            ], false)->getOutput();
+            ], true)->getOutput();
         } elseif (empty($release)) {
             $list = $this->execGitCommand([
                 'branch --no-color -r --no-merged', sprintf('%s/%s', $this->origin, $this->stable), '2>/dev/null',
                 '|', "sed 's/^[* ]*//'",
-            ], false)->getOutput();
+            ], true)->getOutput();
         }
 
         foreach ($list as $index => $branch) {
