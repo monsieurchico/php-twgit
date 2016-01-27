@@ -574,8 +574,8 @@ EOT
         $remoteBranch = sprintf('%s/%s', $this->origin, $branch);
 
         $this->assertValidRefName($branch);
-        #$this->assertCleanWorkingTree();
-        #$this->processFetch();
+        $this->assertCleanWorkingTree();
+        $this->processFetch();
 
         if ($deleteLocal) {
             if ($this->branchExists($branch)) {
