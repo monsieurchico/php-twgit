@@ -5,6 +5,7 @@ php:
   - 5.3
 
 before_script:
+    - cd php-twgit
     - php composer.phar install --dev -vv
 script:
     - phpunit -c phpunit.xml.dist
