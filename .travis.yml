@@ -1,0 +1,11 @@
+# See: http://about.travis-ci.org/docs/user/build-configuration/
+
+language: php
+php:
+  - 5.3
+
+script: phpunit --configuration phpunit.dist.xml
+
+notifications:
+  on_success: always
+  on_failure: always
