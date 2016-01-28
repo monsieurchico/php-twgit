@@ -1,0 +1,18 @@
+# See: http://about.travis-ci.org/docs/user/build-configuration/
+
+language: php
+php:
+  - 5.6
+
+install:
+    - composer install
+
+before_script:
+    - phpenv config-rm xdebug.ini
+
+script:
+    - phpunit -c phpunit.xml.dist
+
+notifications:
+    on_success: always
+    on_failure: always
