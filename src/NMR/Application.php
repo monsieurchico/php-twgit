@@ -4,7 +4,7 @@ namespace NMR;
 
 use Exception;
 use GuzzleHttp\Client;
-use NMR\Command;
+use NMR\Command as NMRCommand;
 use NMR\Config\Config;
 use NMR\Config\ConfigAwareTrait;
 use NMR\Log\Logger;
@@ -12,7 +12,6 @@ use NMR\Log\LoggerAwareTrait;
 use NMR\Shell\Git\GitAwareTrait;
 use NMR\Shell\ShellAwareTrait;
 use Symfony\Component\Console\Application as BaseApplication;
-use Symfony\Component\Console\Command\Command as BaseCommand;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,7 +36,7 @@ class Application extends BaseApplication
 
     const REVISION = 'twgit_revision';
 
-    /** @var Command */
+    /** @var NMRCommand */
     protected $command;
 
     /**
@@ -60,12 +59,13 @@ class Application extends BaseApplication
         $this->initLogger($input, $output);
         $this->initConfig();
 
-        if (!$this->isInGitRepo()) {
+        $this->initCommand($input->getFirstArgument());
+
+        if ($this->command->needGitRepository() && !$this->isInGitRepo()) {
+            $this->getLogger()->warning('This command must be executed in a git repository.');
             $this->showUsage();
             exit(1);
         }
-
-        $this->initCommand($input->getFirstArgument());
 
         $this->command
             ->setLogger($this->logger)
@@ -91,10 +91,10 @@ class Application extends BaseApplication
     protected function getDefaultCommands()
     {
         return [
-            'release' => new Command\ReleaseCommand(),
-            'hotfix' => new Command\HotfixCommand(),
-            'feature' => new Command\FeatureCommand(),
-            'self-update' => new Command\SelfUpdateCommand(),
+            'release' => new NMRCommand\ReleaseCommand(),
+            'hotfix' => new NMRCommand\HotfixCommand(),
+            'feature' => new NMRCommand\FeatureCommand(),
+            'self-update' => new NMRCommand\SelfUpdateCommand(),
         ];
     }
 

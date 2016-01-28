@@ -39,6 +39,14 @@ class SelfUpdateCommand extends Command
     /**
      * {inheritdoc}
      */
+    public function needGitRepository()
+    {
+        return false;
+    }
+
+    /**
+     * {inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $currentRevision = explode('-', $this->getConfig()->get('twgit.protected.revision'))[0];
