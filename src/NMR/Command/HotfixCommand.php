@@ -29,6 +29,14 @@ class HotfixCommand extends Command
     /**
      * {inheritdoc}
      */
+    public function needGitRepository()
+    {
+        return true;
+    }
+
+    /**
+     * {inheritdoc}
+     */
     protected function showUsage()
     {
         $prefixHotfix = $this->getConfig()->get('twgit.workflow.prefixes.hotfix');
