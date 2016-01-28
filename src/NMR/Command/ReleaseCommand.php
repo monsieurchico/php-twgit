@@ -31,6 +31,14 @@ class ReleaseCommand extends Command
     /**
      * {inheritdoc}
      */
+    public function needGitRepository()
+    {
+        return true;
+    }
+
+    /**
+     * {inheritdoc}
+     */
     protected function showUsage()
     {
         $prefixRelease = $this->getConfig()->get('twgit.workflow.prefixes.release');
