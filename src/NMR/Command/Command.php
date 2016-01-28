@@ -59,6 +59,11 @@ abstract class Command extends BaseCommand
     abstract protected function showUsage();
 
     /**
+     * @return bool
+     */
+    abstract public function needGitRepository();
+
+    /**
      * {inheritdoc}
      */
     protected function configure()

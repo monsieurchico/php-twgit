@@ -274,6 +274,14 @@ class Git extends Shell
     {
         $n = 0;
         $digits = explode('.', $tag);
+        if (count($digits) <> 3) {
+            $this->getLogger()->error(sprintf(
+                'Invalid tag "%s": it does not support format "major.minor.revision".',
+                $tag
+            ));
+            exit(-1);
+        }
+
         for ($i = 2 ; $i >= 0 ; $i--) {
             $n += pow(1000, $i) * intval($digits[2 - $i]);
         }

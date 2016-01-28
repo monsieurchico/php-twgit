@@ -29,6 +29,14 @@ class FeatureCommand extends Command
     /**
      * {inheritdoc}
      */
+    public function needGitRepository()
+    {
+        return true;
+    }
+
+    /**
+     * {inheritdoc}
+     */
     protected function showUsage()
     {
         $prefixFeature = $this->getConfig()->get('twgit.workflow.prefixes.feature');
