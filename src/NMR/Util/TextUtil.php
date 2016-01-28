@@ -24,14 +24,17 @@ class TextUtil
     /**
      * @param string $string
      * @param string $separator
+     * @param bool   $lowerCase
      *
      * @return string
      */
-    public static function convertCamelCaseToSeparator($string, $separator = '_')
+    public static function convertCamelCaseToSeparator($string, $separator = '_', $lowerCase = true)
     {
-        return preg_replace_callback('@([A-Z])@', function (&$matches) use ($separator) {
-            return sprintf('%s%s', $separator, strtolower($matches[1]));
+        $convertedString = preg_replace_callback('@[a-z][A-Z]@', function (&$matches) use ($separator, $lowerCase) {
+            return sprintf('%s%s%s', substr($matches[0], 0, 1), $separator, substr($matches[0], 1, 1));
         }, $string);
+
+        return $lowerCase ? strtolower($convertedString) : $convertedString;
     }
 
     /**
@@ -41,6 +44,9 @@ class TextUtil
      */
     public static function sanitize($string)
     {
-        return str_replace(['"', "'", '/', '\\'], '', $string);
+        $string = str_replace(['"', "'", '/', '\\'], ' ', $string);
+        $string = preg_replace('/\s+/', ' ', $string);
+
+        return trim($string);
     }
 }
