@@ -4,7 +4,7 @@ language: php
 php:
   - 5.3
 
-script: phpunit --configuration phpunit.dist.xml
+script: phpunit
 
 notifications:
   on_success: always
