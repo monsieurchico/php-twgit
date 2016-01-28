@@ -2,11 +2,13 @@
 
 language: php
 php:
-  - 5.6
+  - 5.5.9
 
 install:
-    - composer self-update
-    - composer install --dev -vv
+    - composer install
+
+before_script:
+    - phpenv config-rm xdebug.ini
 
 script:
     - phpunit -c phpunit.xml.dist
