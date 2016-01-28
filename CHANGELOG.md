@@ -2,7 +2,7 @@
 
 ## [0.12.0] - 2016-01-28
 ### Added
-- Add changelog ([issue 39](https://github.com/monsieurchico/php-twgit/issues/39))
+- Add changelog ([issue 40](https://github.com/monsieurchico/php-twgit/issues/40))
 
 ## [0.11.0] - 2016-01-28
 ### Fixed
