@@ -55,7 +55,7 @@ class TextUtilTest extends \PHPUnit_Framework_TestCase
         return [
             ['My title with single \' quote', 'My title with single quote'],
             ['My title with double " quote', 'My title with double quote'],
-            ['My title with slash /', 'My title with slash'],
+            ['My title with slash /', 'My title with slash /'],
             ['My title with antislash \\', 'My title with antislash'],
             ['My title with multiple    blanks', 'My title with multiple blanks'],
         ];

@@ -44,7 +44,7 @@ class TextUtil
      */
     public static function sanitize($string)
     {
-        $string = str_replace(['"', "'", '/', '\\'], ' ', $string);
+        $string = str_replace(['"', "'", '\\'], ' ', $string);
         $string = preg_replace('/\s+/', ' ', $string);
 
         return trim($string);
