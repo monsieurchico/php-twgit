@@ -2,9 +2,10 @@
 
 language: php
 php:
-  - 5.3
+  - 5.6
 
 install:
+    - composer self-update
     - composer install --dev -vv
 
 script:
