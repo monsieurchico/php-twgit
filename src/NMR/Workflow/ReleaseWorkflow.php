@@ -50,6 +50,7 @@ class ReleaseWorkflow extends AbstractWorkflow
         }
 
         $version = $this->cleanPrefix($version, self::RELEASE);
+
         $release = $this->getRefName($version, self::RELEASE);
         $this->assertNewAndValidTagName($version);
 
@@ -77,9 +78,10 @@ class ReleaseWorkflow extends AbstractWorkflow
             $this->processPushBranch($release);
         }
 
+
         $this->alertOldBranch($release);
 
-        $this->getConnector()->createProjectVersion($version);
+        $this->createProjectVersion($version);
     }
 
     /**

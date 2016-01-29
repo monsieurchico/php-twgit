@@ -1183,4 +1183,18 @@ EOT
             $this->getLogger()->warning(sprintf('Remote branch "%s" not found.', $branch));
         }
     }
+
+    /**
+     * @param string $version
+     */
+    protected function createProjectVersion($version)
+    {
+        $this->getLogger()->processing(sprintf('Create project version "%s"...', $version), false);
+
+        if ($this->getConnector()->createProjectVersion($version)) {
+            $this->getLogger()->log('g', 'OK');
+        } else {
+            $this->getLogger()->warning('FAILED');
+        }
+    }
 }

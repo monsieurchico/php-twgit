@@ -45,6 +45,10 @@ class JiraConnector extends AbstractConnector
      */
     public function createProjectVersion($version)
     {
+        if (empty($version) || empty($this->project)) {
+            return true;
+        }
+
         if ($this->getProjectVersion($version)) {
             return true;
         }
