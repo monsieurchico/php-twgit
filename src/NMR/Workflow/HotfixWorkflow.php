@@ -71,7 +71,7 @@ class HotfixWorkflow extends AbstractWorkflow
             $version = $this->cleanPrefix($hotfix, self::HOTFIX);
         }
 
-        $this->getConnector()->createProjectVersion($version);
+        $this->createProjectVersion($version);
     }
 
     /**
