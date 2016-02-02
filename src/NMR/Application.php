@@ -2,16 +2,15 @@
 
 namespace NMR;
 
-use Exception;
 use GuzzleHttp\Client;
 use NMR\Command as NMRCommand;
-use NMR\Config\Config;
 use NMR\Config\ConfigAwareTrait;
 use NMR\Log\Logger;
 use NMR\Log\LoggerAwareTrait;
 use NMR\Shell\Git\GitAwareTrait;
 use NMR\Shell\ShellAwareTrait;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,9 +35,6 @@ class Application extends BaseApplication
 
     const REVISION = 'twgit_revision';
 
-    /** @var NMRCommand */
-    protected $command;
-
     /**
      * {inheritdoc}
      */
@@ -54,35 +50,22 @@ class Application extends BaseApplication
     /**
      * {inheritdoc}
      */
-    public function doRun(InputInterface $input, OutputInterface $output)
+    public function doRun(InputInterface $input = null, OutputInterface $output = null)
     {
-        $this->initLogger($input, $output);
-        $this->initConfig();
+        try {
+            return parent::doRun($input, $output);
+        } catch (\Exception $exc) {
+            $logger = new Logger($input, $output);
+            $logger->error($exc->getMessage());
 
-        $this->initCommand($input->getFirstArgument());
-
-        if ($this->command->needGitRepository() && !$this->isInGitRepo()) {
-            $this->getLogger()->warning('This command must be executed in a git repository.');
-            $this->showUsage();
-            exit(1);
+            $name = $this->getCommandName($input);
+            if ($this->has($name)) {
+                $command = $this->get($name);
+                $command->showUsage();
+            } else {
+                $this->showUsage($logger);
+            }
         }
-
-        $this->command
-            ->setLogger($this->logger)
-            ->setConfig($this->config)
-            ->setClient(new Client())
-        ;
-
-        return parent::doRun($input, $output);
-    }
-
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
-    protected function initLogger(InputInterface $input, OutputInterface $output)
-    {
-        $this->logger = new Logger($input, $output);
     }
 
     /**
@@ -91,79 +74,12 @@ class Application extends BaseApplication
     protected function getDefaultCommands()
     {
         return [
-            'release' => new NMRCommand\ReleaseCommand(),
-            'hotfix' => new NMRCommand\HotfixCommand(),
-            'feature' => new NMRCommand\FeatureCommand(),
-            'self-update' => new NMRCommand\SelfUpdateCommand(),
+            'release' => new Command\ReleaseCommand(),
+            'hotfix' => new Command\HotfixCommand(),
+            'feature' => new Command\FeatureCommand(),
+            'init' => new Command\InitCommand(),
+            'self-update' => new Command\SelfUpdateCommand(),
         ];
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isInGitRepo()
-    {
-        return is_dir(realpath(getcwd()) . '/.git/');
-    }
-
-    /**
-     */
-    protected function initConfig()
-    {
-        $createConfigFile = false;
-
-        $this->config = Config::create(getenv('HOME'), realpath(getcwd()));
-        $this->config->set('twgit.protected.revision', self::REVISION);
-
-        $sourceConfig = __DIR__ . '/../../app/config/config.yml.dist';
-        foreach (['global', 'project'] as $part) {
-
-            $configDir = sprintf($this->config->get(sprintf('twgit.protected.%s.root_dir', $part)));
-            $configFile = sprintf('%s/%s', $configDir, $this->config->get('twgit.protected.config_file'));
-
-            if ('project' === $part && !$this->isInGitRepo()) {
-                continue;
-            }
-
-            if (!is_dir($configDir)) {
-                mkdir($configDir, 0755);
-            }
-
-            if (!is_file($configFile)) {
-                copy($sourceConfig, $configFile);
-                $createConfigFile = true;
-                $this->logger->help(sprintf(
-                    'A %s config file has been created in "%s". Please configure it !',
-                    $part,
-                    $configFile
-                ));
-            }
-
-            $this->config->import($configFile);
-            $sourceConfig = $configFile;
-        }
-
-        if ($createConfigFile) {
-            exit(1);
-        }
-    }
-
-    /**
-     * @param string $command
-     *
-     * @return Command
-     */
-    protected function initCommand($command)
-    {
-        try {
-            $this->command = $this->get($command);
-        } catch (\Exception $ex) {
-            if (!empty($command)) {
-                $this->getLogger()->error(sprintf('Unknown command "%s".', $command));
-            }
-            $this->showUsage();
-            exit(1);
-        }
     }
 
     /**
@@ -180,11 +96,11 @@ class Application extends BaseApplication
     /**
      * {inheritdoc}
      */
-    protected function showUsage()
+    public function showUsage($logger)
     {
         $version = self::REVISION;
 
-        $this->logger->log('info', <<<EOT
+        $logger->writeln(<<<EOT
 <cb>(i)</> <c>Usage:</>
 <wb>    twgit <command> [<action>]</>
     Always provide branch names wthout any prefix (see config file).
@@ -194,6 +110,17 @@ class Application extends BaseApplication
     <wb>hotfix</>          Manage your hotfix branches.
     <wb>feature</>         Manage your feature branches.
     <wb>self-update</>     Update the version of twgit.
+
+    <wb>init <tagname> [<url>]</>
+                    Initialize git repository for twgit:
+                      – git init if necessary
+                      – add remote origin <url> if necessary
+                      – create 'stable' branch if not exists, or pull 'origin/stable'
+                        branch if exists
+                      – create <tagname> tag on HEAD of stable, e.g. 1.2.3, using
+                        major.minor.revision format.
+                        Prefix 'v' will be added to the specified <tagname>.
+                      A remote repository must exists.
 
 <cb>(i) See also:</>
     Try 'twgit command [help]' for more details
@@ -206,6 +133,5 @@ class Application extends BaseApplication
 EOT
         );
     }
-
 
 }

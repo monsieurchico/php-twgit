@@ -72,7 +72,7 @@ class ReleaseWorkflow extends AbstractWorkflow
             $lastTag = $this->getGit()->getLastTag();
             $this->execGitCommand([
                 'checkout -b', $release, sprintf('tags/%s', $lastTag)
-            ], false, sprintf('Cound not check out tag "%s".', $lastTag));
+            ], false, sprintf('Could not check out tag "%s".', $lastTag));
 
             $this->processFirstCommit($release, self::RELEASE, '');
             $this->processPushBranch($release);

@@ -31,7 +31,6 @@ class Logger
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
-     * @param QuestionHelper  $questionHelper
      * @param Table           $table
      */
     public function __construct(InputInterface $input, OutputInterface $output)
@@ -73,32 +72,32 @@ class Logger
         $styles = [
             'error' => ['fg' => 'red'],
             'error_bold' => ['fg' => 'red', 'options' => ['bold']],
-            'error_header' => ['fg' => 'yellow', ['options' => ['underline']]],
+            'error_header' => ['fg' => 'yellow', 'options' => ['underscore']],
             'feature_subject' => ['fg' => 'cyan'],
             'help' => ['fg' => 'cyan'],
             'help_detail' => ['fg' => 'cyan', 'options' => ['bold']],
-            'info' => ['fg' => 'white', ['options' => ['bold']]],
+            'info' => ['fg' => 'white', 'options' => ['bold']],
             'code' => ['fg' => 'magenta'],
             'processing' => ['fg' => 'default'],
-            'b' => ['options' => ['bold']],
+            'bd' => ['options' => ['bold']],
             'u' => ['options' => ['underscore']],
             'warning' => ['fg' => 'yellow'],
-            'warning_bold' => ['fg' => 'yellow', ['options' => ['bold']]],
+            'warning_bold' => ['fg' => 'yellow', 'options' => ['bold']],
 
             'c' => ['fg' => 'cyan'],
-            'cb' => ['fg' => 'cyan', ['options' => ['bold']]],
+            'cb' => ['fg' => 'cyan', 'options' => ['bold']],
             'r' => ['fg' => 'red'],
-            'rb' => ['fg' => 'red', ['options' => ['bold']]],
+            'rb' => ['fg' => 'red', 'options' => ['bold']],
             'y' => ['fg' => 'yellow'],
-            'yb' => ['fg' => 'yellow', ['options' => ['bold']]],
+            'yb' => ['fg' => 'yellow', 'options' => ['bold']],
             'b' => ['fg' => 'blue'],
-            'bb' => ['fg' => 'blue', ['options' => ['bold']]],
+            'bb' => ['fg' => 'blue', 'options' => ['bold']],
             'w' => ['fg' => 'white'],
-            'wb' => ['fg' => 'white', ['options' => ['bold']]],
+            'wb' => ['fg' => 'white', 'options' => ['bold']],
             'm' => ['fg' => 'magenta'],
-            'mb' => ['fg' => 'magenta', ['options' => ['bold']]],
+            'mb' => ['fg' => 'magenta', 'options' => ['bold']],
             'g' => ['fg' => 'green'],
-            'gb' => ['fg' => 'green', ['options' => ['bold']]],
+            'gb' => ['fg' => 'green', 'options' => ['bold']]
         ];
 
         foreach ($styles as $name => $definition) {
@@ -124,7 +123,8 @@ class Logger
     }
 
     /**
-     * @param $message
+     * @param array $data
+     * @param array $headers
      *
      * @return string
      */
@@ -138,7 +138,8 @@ class Logger
     }
 
     /**
-     * @param $message
+     * @param string $message
+     * @param bool   $newLine
      *
      * @return string
      */
@@ -148,7 +149,8 @@ class Logger
     }
 
     /**
-     * @param $message
+     * @param string $message
+     * @param bool   $newLine
      */
     public function help($message, $newLine = true)
     {
@@ -156,7 +158,8 @@ class Logger
     }
 
     /**
-     * @param $message
+     * @param string $message
+     * @param bool   $newLine
      */
     public function processing($message, $newLine = true)
     {
@@ -165,7 +168,7 @@ class Logger
 
     /**
      * @param string $message
-     * @param array  $newLine
+     * @param bool   $newLine
      */
     public function emergency($message, $newLine = true)
     {
@@ -174,7 +177,7 @@ class Logger
 
     /**
      * @param string $message
-     * @param array  $newLine
+     * @param bool   $newLine
      */
     public function alert($message, $newLine = true)
     {
@@ -183,7 +186,7 @@ class Logger
 
     /**
      * @param string $message
-     * @param array  $newLine
+     * @param bool   $newLine
      */
     public function critical($message, $newLine = true)
     {
@@ -192,7 +195,7 @@ class Logger
 
     /**
      * @param string $message
-     * @param array  $newLine
+     * @param bool   $newLine
      */
     public function error($message, $newLine = true)
     {
@@ -201,7 +204,7 @@ class Logger
 
     /**
      * @param string $message
-     * @param array  $newLine
+     * @param bool   $newLine
      */
     public function warning($message, $newLine = true)
     {
@@ -210,7 +213,7 @@ class Logger
 
     /**
      * @param string $message
-     * @param array  $newLine
+     * @param bool   $newLine
      */
     public function notice($message, $newLine = true)
     {
@@ -219,7 +222,7 @@ class Logger
 
     /**
      * @param string $message
-     * @param array  $newLine
+     * @param bool   $newLine
      */
     public function info($message, $newLine = true)
     {
@@ -228,7 +231,7 @@ class Logger
 
     /**
      * @param string $message
-     * @param array  $newLine
+     * @param bool   $newLine
      */
     public function debug($message, $newLine = true)
     {
@@ -238,7 +241,7 @@ class Logger
     /**
      * @param mixed  $level
      * @param string $message
-     * @param array  $newLine
+     * @param bool   $newLine
      */
     public function log($level, $message, $newLine = true)
     {
