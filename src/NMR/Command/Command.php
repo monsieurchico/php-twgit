@@ -114,13 +114,14 @@ abstract class Command extends BaseCommand
 
             call_user_func_array([$workflow, $action], [$input]);
         } catch (Exception $ex) {
-            $this->getLogger()->error($ex->getMessage());
 
             if ($ex instanceOf ConfigurationException) {
                 $this->showUsage();
             } elseif ($ex instanceOf WorkflowException && $ex->getGitExitCommand()) {
                 $response = $this->getGit()->execCommand($ex->getGitExitCommand());
                 $this->getLogger()->writeln($response->getOutput());
+            } else {
+                throw $ex;
             }
 
             exit(1);

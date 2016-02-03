@@ -67,14 +67,11 @@ class Application extends BaseApplication
 
             if ($this->has($name)) {
                 $command = $this->get($name);
-                exit(1);
             } else {
                 $command = $this->get(self::DEFAULT_COMMAND);
             }
 
-            $exitCode = $this->doRunCommand($command, $input, $output);
-
-            exit($exitCode);
+            $command->showUsage();
         }
     }
 
