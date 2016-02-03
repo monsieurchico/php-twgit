@@ -188,9 +188,7 @@ abstract class Command extends BaseCommand
      */
     protected function initLogger(InputInterface $input, OutputInterface $output)
     {
-        if (empty($this->logger)) {
-            $this->logger = new Logger($input, $output);
-        }
+        $this->logger = new Logger($input, $output);
     }
 
     /**
