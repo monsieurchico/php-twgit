@@ -56,11 +56,6 @@ abstract class Command extends BaseCommand
     abstract public function needTwgitRepository();
 
     /**
-     * @return bool
-     */
-    abstract public function needGitRepository();
-
-    /**
      * {inheritdoc}
      */
     protected function configure()
