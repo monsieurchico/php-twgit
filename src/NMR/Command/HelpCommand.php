@@ -60,7 +60,7 @@ class HelpCommand extends Command
         $origin = $this->getConfig()->get('twgit.git.origin');
         $stable = $this->getConfig()->get('twgit.git.stable');
 
-        $this->getLogger()->info(<<<EOT
+        $message = <<<EOT
 <cb>(i)</> <c>Usage:</>
 <wb>    twgit <command> [<action>]</>
     Always provide branch names wthout any prefix (see config file).
@@ -79,7 +79,15 @@ class HelpCommand extends Command
                         branch if exists
                       – create <tagname> tag on HEAD of stable, e.g. 1.2.3, using
                         major.minor.revision format.
+EOT;
+        if (!empty($prefixTag)) {
+            $message .= <<<EOT
+            
                         Prefix '{$prefixTag}' will be added to the specified <tagname>.
+EOT;
+        }
+        $message .= <<<EOT
+
                       A remote repository must exists.
 
 <cb>(i) See also:</>
@@ -89,8 +97,8 @@ class HelpCommand extends Command
     Contact:            git@github.com:monsieurchico/php-twgit.git
     Adapted from:       git@github.com:Twenga/twgit.git
     Revision:           {$version}
-EOT
-        );
+EOT;
+            $this->getLogger()->info($message);
     }
 
 }
