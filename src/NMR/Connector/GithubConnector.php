@@ -67,6 +67,10 @@ class GithubConnector extends AbstractConnector
      */
     public function createProjectVersion($version)
     {
+        if (empty($version)) {
+            return true;
+        }
+
         $response = $this->getClient()->post(
             $this->getUrl(self::URL_TYPE_MILESTONES),
             array_merge(
