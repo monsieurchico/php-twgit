@@ -16,6 +16,9 @@ class HelpCommand extends Command
     /** @var Command */
     protected $relatedCommand;
 
+    /** @var string */
+    protected $errorMessage;
+
     /**
      * @param Command $relatedCommand
      *
@@ -24,6 +27,18 @@ class HelpCommand extends Command
     public function setRelatedCommand(Command $relatedCommand = null)
     {
         $this->relatedCommand = $relatedCommand;
+
+        return $this;
+    }
+
+    /**
+     * @param string $errorMessage
+     *
+     * @return HelpCommand
+     */
+    public function setErrorMessage($errorMessage)
+    {
+        $this->errorMessage = $errorMessage;
 
         return $this;
     }
@@ -46,6 +61,10 @@ class HelpCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($this->errorMessage) {
+            $this->getLogger()->error($this->errorMessage);
+        }
+
         if (!empty($this->relatedCommand)) {
             $this->relatedCommand->showUsage();
         } else {

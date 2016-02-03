@@ -60,9 +60,6 @@ class Application extends BaseApplication
         try {
             return parent::doRun($input, $output);
         } catch (\Exception $exc) {
-            $logger = new Logger($input, $output);
-            $logger->error($exc->getMessage());
-
             $name = $this->getCommandName($input);
             $relatedCommand = null;
             if ($this->has($name)) {
@@ -72,8 +69,8 @@ class Application extends BaseApplication
             /** @var NMRCommand\HelpCommand $command */
             $command = $this->get(self::DEFAULT_COMMAND);
             $command
-                ->setLogger($logger)
-                ->setRelatedCommand($relatedCommand);
+                ->setRelatedCommand($relatedCommand)
+                ->setErrorMessage($exc->getMessage());
 
             $exitCode = $this->doRunCommand($command, $input, $output);
 
