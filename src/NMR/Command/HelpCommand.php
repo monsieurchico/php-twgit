@@ -56,6 +56,9 @@ class HelpCommand extends Command
     public function showUsage()
     {
         $version = Application::REVISION;
+        $prefixTag = $this->getConfig()->get('twgit.workflow.prefixes.tag');
+        $origin = $this->getConfig()->get('twgit.git.origin');
+        $stable = $this->getConfig()->get('twgit.git.stable');
 
         $this->getLogger()->info(<<<EOT
 <cb>(i)</> <c>Usage:</>
@@ -72,11 +75,11 @@ class HelpCommand extends Command
                     Initialize git repository for twgit:
                       – git init if necessary
                       – add remote origin <url> if necessary
-                      – create 'stable' branch if not exists, or pull 'origin/stable'
+                      – create 'stable' branch if not exists, or pull '{$origin}/{$stable}'
                         branch if exists
                       – create <tagname> tag on HEAD of stable, e.g. 1.2.3, using
                         major.minor.revision format.
-                        Prefix 'v' will be added to the specified <tagname>.
+                        Prefix '{$prefixTag}' will be added to the specified <tagname>.
                       A remote repository must exists.
 
 <cb>(i) See also:</>

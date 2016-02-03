@@ -72,9 +72,10 @@ class Application extends BaseApplication
             }
 
             $command->setLogger($logger);
-            $command->showUsage();
 
-            return 1;
+            $exitCode = $this->doRunCommand($command, $input, $output);
+
+            return $exitCode;
         }
     }
 
