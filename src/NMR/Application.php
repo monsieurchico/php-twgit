@@ -64,14 +64,16 @@ class Application extends BaseApplication
             $logger->error($exc->getMessage());
 
             $name = $this->getCommandName($input);
-
+            $relatedCommand = null;
             if ($this->has($name)) {
-                $command = $this->get($name);
-            } else {
-                $command = $this->get(self::DEFAULT_COMMAND);
+                $relatedCommand = $this->get($name);
             }
 
-            $command->setLogger($logger);
+            /** @var NMRCommand\HelpCommand $command */
+            $command = $this->get(self::DEFAULT_COMMAND);
+            $command
+                ->setLogger($logger)
+                ->setRelatedCommand($relatedCommand);
 
             $exitCode = $this->doRunCommand($command, $input, $output);
 

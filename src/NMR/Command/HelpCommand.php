@@ -13,6 +13,21 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class HelpCommand extends Command
 {
+    /** @var Command */
+    protected $relatedCommand;
+
+    /**
+     * @param Command $relatedCommand
+     *
+     * @return HelpCommand
+     */
+    public function setRelatedCommand(Command $relatedCommand = null)
+    {
+        $this->relatedCommand = $relatedCommand;
+
+        return $this;
+    }
+
     /**
      * {inheritdoc}
      */
@@ -31,7 +46,11 @@ class HelpCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->showUsage();
+        if (!empty($this->relatedCommand)) {
+            $this->relatedCommand->showUsage();
+        } else {
+            $this->showUsage();
+        }
     }
 
     /**
@@ -82,7 +101,7 @@ class HelpCommand extends Command
 EOT;
         if (!empty($prefixTag)) {
             $message .= <<<EOT
-            
+
                         Prefix '{$prefixTag}' will be added to the specified <tagname>.
 EOT;
         }
