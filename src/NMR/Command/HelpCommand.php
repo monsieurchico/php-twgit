@@ -2,17 +2,16 @@
 
 namespace NMR\Command;
 
-use NMR\Config\Config;
-use Symfony\Component\Console\Command\Command as BaseCommand;
+use NMR\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class InitCommand
+ * Class FeatureCommand
  */
-class InitCommand extends Command
+class HelpCommand extends Command
 {
     /**
      * {inheritdoc}
@@ -20,20 +19,19 @@ class InitCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('init')
-            ->setDescription('Initialize git repository for twgit')
-            ->addArgument('command', InputArgument::REQUIRED, 'Command')
-            ->addArgument('tagname', InputArgument::REQUIRED, 'TagName')
-            ->addArgument('remoteUrl', InputArgument::OPTIONAL, 'remoteUrl')
-            ->addOption('silent', 's', InputOption::VALUE_NONE, 'Disable interactive mode');
+            ->setName('help')
+            ->addArgument('command', InputArgument::OPTIONAL, 'Command')
+            ->addArgument('action', InputArgument::OPTIONAL, 'Action')
+            ->addOption('silent', 's', InputOption::VALUE_NONE, 'Disable interactive mode')
+        ;
     }
 
     /**
-     * Init empty configuration
+     * {inheritdoc}
      */
-    protected function initConfig()
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->config = new Config();
+        $this->showUsage();
     }
 
     /**
@@ -55,23 +53,22 @@ class InitCommand extends Command
     /**
      * {inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $this->initWorkflow()->initAction($input);
-    }
-
-    /**
-     * {inheritdoc}
-     */
     public function showUsage()
     {
-        $prefixHotfix = $this->getConfig()->get('twgit.workflow.prefixes.tag');
+        $version = Application::REVISION;
 
-        $this->getLogger()->writeln(
-            <<<EOT
-<cb>(i)</> <c>Usage</>
-<wb>    twgit init <tagname> [<url>]</>
+        $this->getLogger()->info(<<<EOT
+<cb>(i)</> <c>Usage:</>
+<wb>    twgit <command> [<action>]</>
+    Always provide branch names wthout any prefix (see config file).
 
+<cb>(i)</> <c>Availabe commands are:</>
+    <wb>release</>         Manage your release branches.
+    <wb>hotfix</>          Manage your hotfix branches.
+    <wb>feature</>         Manage your feature branches.
+    <wb>self-update</>     Update the version of twgit.
+
+    <wb>init <tagname> [<url>]</>
                     Initialize git repository for twgit:
                       – git init if necessary
                       – add remote origin <url> if necessary
@@ -81,7 +78,16 @@ class InitCommand extends Command
                         major.minor.revision format.
                         Prefix 'v' will be added to the specified <tagname>.
                       A remote repository must exists.
+
+<cb>(i) See also:</>
+    Try 'twgit command [help]' for more details
+
+<cb>(i) About:</>
+    Contact:            git@github.com:monsieurchico/php-twgit.git
+    Adapted from:       git@github.com:Twenga/twgit.git
+    Revision:           {$version}
 EOT
         );
     }
+
 }

@@ -33,7 +33,10 @@ class Application extends BaseApplication
         ShellAwareTrait
         ;
 
-    const REVISION = 'twgit_revision';
+    const
+        REVISION = 'twgit_revision',
+        DEFAULT_COMMAND = 'help'
+    ;
 
     /**
      * {inheritdoc}
@@ -45,6 +48,8 @@ class Application extends BaseApplication
 //        });
 
         parent::__construct('Twgit', self::REVISION);
+
+        $this->setDefaultCommand(self::DEFAULT_COMMAND);
     }
 
     /**
@@ -59,12 +64,17 @@ class Application extends BaseApplication
             $logger->error($exc->getMessage());
 
             $name = $this->getCommandName($input);
+
             if ($this->has($name)) {
                 $command = $this->get($name);
-                $command->showUsage();
+                exit(1);
             } else {
-                $this->showUsage($logger);
+                $command = $this->get(self::DEFAULT_COMMAND);
             }
+
+            $exitCode = $this->doRunCommand($command, $input, $output);
+
+            exit($exitCode);
         }
     }
 
@@ -79,6 +89,7 @@ class Application extends BaseApplication
             'feature' => new Command\FeatureCommand(),
             'init' => new Command\InitCommand(),
             'self-update' => new Command\SelfUpdateCommand(),
+            'help' => new Command\HelpCommand(),
         ];
     }
 
@@ -92,46 +103,4 @@ class Application extends BaseApplication
 
         return $inputDefinition;
     }
-
-    /**
-     * {inheritdoc}
-     */
-    public function showUsage($logger)
-    {
-        $version = self::REVISION;
-
-        $logger->writeln(<<<EOT
-<cb>(i)</> <c>Usage:</>
-<wb>    twgit <command> [<action>]</>
-    Always provide branch names wthout any prefix (see config file).
-
-<cb>(i)</> <c>Availabe commands are:</>
-    <wb>release</>         Manage your release branches.
-    <wb>hotfix</>          Manage your hotfix branches.
-    <wb>feature</>         Manage your feature branches.
-    <wb>self-update</>     Update the version of twgit.
-
-    <wb>init <tagname> [<url>]</>
-                    Initialize git repository for twgit:
-                      – git init if necessary
-                      – add remote origin <url> if necessary
-                      – create 'stable' branch if not exists, or pull 'origin/stable'
-                        branch if exists
-                      – create <tagname> tag on HEAD of stable, e.g. 1.2.3, using
-                        major.minor.revision format.
-                        Prefix 'v' will be added to the specified <tagname>.
-                      A remote repository must exists.
-
-<cb>(i) See also:</>
-    Try 'twgit command [help]' for more details
-
-<cb>(i) About:</>
-    Contact:            git@github.com:monsieurchico/php-twgit.git
-    Adapted from:       git@github.com:Twenga/twgit.git
-    Revision:           {$version}
-
-EOT
-        );
-    }
-
 }

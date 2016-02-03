@@ -43,20 +43,6 @@ abstract class Command extends BaseCommand
     /** @var array */
     protected $actions;
 
-    /** @var AbstractWorkflow */
-    protected $workflow;
-
-    /**
-     * @param AbstractWorkflow $workflow
-     *
-     * @return Command
-     */
-    public function setWorkflow(AbstractWorkflow $workflow)
-    {
-        $this->workflow = $workflow;
-
-        return $this;
-    }
 
     /**
      */
@@ -117,16 +103,16 @@ abstract class Command extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->initWorkflow();
+        $workflow = $this->initWorkflow();
 
         try {
             $action = $this->getAction($input);
-            if (!method_exists($this->workflow, $action)) {
+            if (!method_exists($workflow, $action)) {
                 $this->showUsage();
                 exit(1);
             }
 
-            call_user_func_array([$this->workflow, $action], [$input]);
+            call_user_func_array([$workflow, $action], [$input]);
         } catch (Exception $ex) {
             $this->getLogger()->error($ex->getMessage());
 
@@ -179,7 +165,7 @@ abstract class Command extends BaseCommand
             str_replace('Command', '', TextUtil::getNamespaceShortName($this))
         );
 
-        $this->workflow = (new $classname($this->config))
+        $workflow = (new $classname($this->config))
             ->setGit($this->git)
             ->setShell($this->shell)
             ->setLogger($this->logger);
@@ -189,8 +175,10 @@ abstract class Command extends BaseCommand
         if (!empty($type)) {
             $connectorFactory = new ConnectorFactory();
             $connector = $connectorFactory->create($type, $this->getConfig(), $this->getClient());
-            $this->workflow->setConnector($connector);
+            $workflow->setConnector($connector);
         }
+
+        return $workflow;
     }
 
     /**
@@ -209,8 +197,6 @@ abstract class Command extends BaseCommand
     {
         $this->config = Config::create(getenv('HOME'), $this->git->getProjectRootDir());
         $this->config->set('twgit.protected.revision', Application::REVISION);
-
-
     }
 
     /**
