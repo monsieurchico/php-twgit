@@ -37,13 +37,21 @@ class HotfixCommand extends Command
     /**
      * {inheritdoc}
      */
-    protected function showUsage()
+    public function needTwgitRepository()
+    {
+        return true;
+    }
+
+    /**
+     * {inheritdoc}
+     */
+    public function showUsage()
     {
         $prefixHotfix = $this->getConfig()->get('twgit.workflow.prefixes.hotfix');
         $prefixTag = $this->getConfig()->get('twgit.workflow.prefixes.tag');
         $stable = $this->getConfig()->get('twgit.git.stable');
 
-        $this->getLogger()->help(<<<EOT
+        $this->getLogger()->writeln(<<<EOT
 <cb>(i)</> <c>Usage</>
 <wb>    twgit hotfix [<action>]</>
 

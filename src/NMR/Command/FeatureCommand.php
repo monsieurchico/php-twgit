@@ -37,13 +37,21 @@ class FeatureCommand extends Command
     /**
      * {inheritdoc}
      */
-    protected function showUsage()
+    public function needTwgitRepository()
+    {
+        return true;
+    }
+
+    /**
+     * {inheritdoc}
+     */
+    public function showUsage()
     {
         $prefixFeature = $this->getConfig()->get('twgit.workflow.prefixes.feature');
 
-        $this->getLogger()->help(<<<EOT
+        $this->getLogger()->writeln(<<<EOT
 <cb>(i)</> <c>Usage</>
-<wb>    twgit feature [<action>]</>
+<wb>    twgit feature <action></>
 
 <cb>(i)</> <c>Availabe commands are:</>
     <wb>merge-into-release [<featurename]</>

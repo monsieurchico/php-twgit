@@ -58,6 +58,7 @@ abstract class AbstractWorkflow
     /** @var string */
     protected $userRepositoryRootDir;
 
+
     /** @var string */
     protected $featuresSubjectPath;
 
@@ -417,6 +418,7 @@ abstract class AbstractWorkflow
         $allTags = $this->getGit()->getTags();
 
         foreach ($allTags as $tag) {
+            $tag = $this->getRefName($tag, self::TAG);
             $tagRev = $this->execGitCommand(['rev-list', 'tags/' . $tag, '|', 'head -n 1'], true)->getOutputLastLine();
             $mergeBase = $this->execGitCommand(['merge-base', $releaseRev, $tagRev], true)->getOutputLastLine();
 
@@ -436,7 +438,7 @@ abstract class AbstractWorkflow
     protected function assertValidRefName($branch)
     {
         $this->getLogger()->processing('Check valid ref name...');
-        $response = $this->execGitCommand(
+        $this->execGitCommand(
             ['check-ref-format --branch', sprintf('"%s"', $branch), '1>/dev/null 2>&1'],
             true,
             sprintf('<error_bold>%s</> is not a valid reference name! See <error_bold>git check-ref-format</> for more details.', $branch)
@@ -499,7 +501,7 @@ abstract class AbstractWorkflow
 EOT
                 , $this->config->get('twgit.command')));
             } else {
-                $response = $this->execGitCommand(['checkout', $branch], false, sprintf('Could not checkout "%s".', $branch));
+                $this->execGitCommand(['checkout', $branch], false, sprintf('Could not checkout "%s".', $branch));
                 $this->informAboutBranchStatus($branch);
                 $this->alertOldBranch($branch);
             }
@@ -523,7 +525,7 @@ EOT
 
         $this->getLogger()->help(sprintf('Last tag: %s', $lastTag));
 
-        return $lastTag;
+        return $this->getRefName($lastTag, self::TAG);
     }
 
     /**
@@ -554,8 +556,8 @@ EOT
         $tag = $this->getRefName($version, self::TAG);
         $this->getLogger()->processing(sprintf('Check whether tag "%s" already exists...', $tag));
 
-        if ($this->tagExists($tag)) {
-            throw new WorkflowException(sprintf('Tag <error_bold>%s</> already exusts. Try <error_bold>twgit tag list</>.', $tag));
+        if ($this->tagExists($version)) {
+            throw new WorkflowException(sprintf('Tag <error_bold>%s</> already exists. Try <error_bold>twgit tag list</>.', $tag));
         }
     }
 
@@ -622,7 +624,6 @@ EOT
     protected function isInitialAuthor($branch, $type, $interactive = true)
     {
         $this->getLogger()->processing('Check initial author...');
-
         $branchAuthor = $this->execGitCommand([
             sprintf('log %s/%s..%s/%s', $this->origin, $this->stable, $this->origin, $branch),
             '--format="%an <%ae>"', '--first-parent', '--no-merges',
@@ -650,13 +651,24 @@ EOT
     }
 
     /**
+     * Check if current local repository has a remote origin repository configured
+     * @return bool
+     */
+    protected function hasOriginRepository()
+    {
+        return '0' !== $this->execGitCommand([
+                sprintf('remote | grep -E "^%s$" | wc -l', $this->origin)
+            ], true)->getOutputLastLine();
+    }
+
+    /**
      * @param string $name
      * @param string $type
      * @param string $subject
      *
      * @throws ShellException
      */
-    protected function processFirstCommit($name, $type, $subject)
+    protected function processFirstCommit($name, $type, $subject = '')
     {
         $message = trim(sprintf($this->firstCommitMessage, $type, $name, $subject));
         $this->execGitCommand(
@@ -1196,5 +1208,17 @@ EOT
         } else {
             $this->getLogger()->warning('FAILED');
         }
+    }
+
+    /**
+     * Check if twgit is initialized by checking if config exists
+     * @throws WorkflowException
+     */
+    protected function isTwgitInitialized()
+    {
+        $this->config = Config::create(getenv('HOME'), $this->git->getProjectRootDir());
+        $configDir = sprintf($this->config->get(sprintf('twgit.protected.project.config_dir')));
+        $configFile = sprintf('%s/%s', $configDir, $this->config->get('twgit.protected.config_file'));
+        return file_exists($configFile);
     }
 }

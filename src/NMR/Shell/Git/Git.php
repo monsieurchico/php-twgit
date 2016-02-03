@@ -22,6 +22,9 @@ class Git extends Shell
         VERSION_NEXT = 2
     ;
 
+    private $projectRootDir;
+    private $isInsideWorkTree;
+
     /**
      * @return string
      */
@@ -331,5 +334,34 @@ class Git extends Shell
         }
 
         return $tag;
+    }
+
+    /**
+     * Check if actually in a git repository
+     * @return bool
+     */
+    public function isInGitRepo() {
+
+        if (!isset($this->isInsideWorkTree)) {
+            $this->isInsideWorkTree = ('true' === $this->execCommand(
+                    $this->buildCommand(['rev-parse', '--is-inside-work-tree', '2> /dev/null']),
+                    '',
+                    true,
+                    false
+                )->getOutputLastLine());
+        }
+        return $this->isInsideWorkTree;
+    }
+
+    /**
+     * Get project root dir
+     * @return string
+     */
+    public function getProjectRootDir()
+    {
+        if (!isset($this->projectRootDir)) {
+            $this->projectRootDir = realpath($this->revParse('--git-dir', array()) . DIRECTORY_SEPARATOR . '..');
+        }
+        return $this->projectRootDir;
     }
 }

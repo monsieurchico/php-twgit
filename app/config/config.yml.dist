@@ -2,7 +2,7 @@ parameters:
     command: twgit
 
     git:
-        stable: 'master'
+        stable: 'stable'
         origin: 'origin'
 
     workflow:
@@ -35,7 +35,7 @@ parameters:
             token: ~ # check https://trello.com/docs/gettingstarted/index.html#getting-a-token-from-a-user
 
     features:
-        subject_filename: 'twgit_features_subject'
+        subject_filename: 'features_subject'
 
     update:
          log_filename: 'lastupdate'
