@@ -71,8 +71,9 @@ class Application extends BaseApplication
                 $command = $this->get(self::DEFAULT_COMMAND);
             }
 
-            $command->initLogger($input, $output);
+            $command->setLogger($logger);
             $command->showUsage();
+
             return 1;
         }
     }
