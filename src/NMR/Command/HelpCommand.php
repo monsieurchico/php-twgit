@@ -31,9 +31,6 @@ class HelpCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        dump($input->getArgument('command'));
-        die;
-
         $this->showUsage();
     }
 
