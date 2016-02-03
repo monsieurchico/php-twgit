@@ -84,7 +84,11 @@ class GithubConnector extends AbstractConnector
             )
         );
 
-        return self::HTTP_STATUS_OK === $response->getStatusCode();
+        if (self::HTTP_STATUS_OK !== $response->getStatusCode()) {
+            return null !== $this->getProjectVersionInfo($version);
+        }
+
+        return false;
     }
 
     /**
