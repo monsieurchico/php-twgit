@@ -2,16 +2,15 @@
 
 namespace NMR;
 
-use Exception;
 use GuzzleHttp\Client;
 use NMR\Command as NMRCommand;
-use NMR\Config\Config;
 use NMR\Config\ConfigAwareTrait;
 use NMR\Log\Logger;
 use NMR\Log\LoggerAwareTrait;
 use NMR\Shell\Git\GitAwareTrait;
 use NMR\Shell\ShellAwareTrait;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,10 +33,10 @@ class Application extends BaseApplication
         ShellAwareTrait
         ;
 
-    const REVISION = 'twgit_revision';
-
-    /** @var NMRCommand */
-    protected $command;
+    const
+        REVISION = 'twgit_revision',
+        DEFAULT_COMMAND = 'help'
+    ;
 
     /**
      * {inheritdoc}
@@ -49,40 +48,34 @@ class Application extends BaseApplication
 //        });
 
         parent::__construct('Twgit', self::REVISION);
+
+        $this->setDefaultCommand(self::DEFAULT_COMMAND);
     }
 
     /**
      * {inheritdoc}
      */
-    public function doRun(InputInterface $input, OutputInterface $output)
+    public function doRun(InputInterface $input = null, OutputInterface $output = null)
     {
-        $this->initLogger($input, $output);
-        $this->initConfig();
+        try {
+            return parent::doRun($input, $output);
+        } catch (\Exception $exc) {
+            $name = $this->getCommandName($input);
+            $relatedCommand = null;
+            if ($this->has($name)) {
+                $relatedCommand = $this->get($name);
+            }
 
-        $this->initCommand($input->getFirstArgument());
+            /** @var NMRCommand\HelpCommand $command */
+            $command = $this->get(self::DEFAULT_COMMAND);
+            $command
+                ->setRelatedCommand($relatedCommand)
+                ->setErrorMessage($exc->getMessage());
 
-        if ($this->command->needGitRepository() && !$this->isInGitRepo()) {
-            $this->getLogger()->warning('This command must be executed in a git repository.');
-            $this->showUsage();
-            exit(1);
+            $exitCode = $this->doRunCommand($command, $input, $output);
+
+            return $exitCode;
         }
-
-        $this->command
-            ->setLogger($this->logger)
-            ->setConfig($this->config)
-            ->setClient(new Client())
-        ;
-
-        return parent::doRun($input, $output);
-    }
-
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
-    protected function initLogger(InputInterface $input, OutputInterface $output)
-    {
-        $this->logger = new Logger($input, $output);
     }
 
     /**
@@ -91,79 +84,13 @@ class Application extends BaseApplication
     protected function getDefaultCommands()
     {
         return [
-            'release' => new NMRCommand\ReleaseCommand(),
-            'hotfix' => new NMRCommand\HotfixCommand(),
-            'feature' => new NMRCommand\FeatureCommand(),
-            'self-update' => new NMRCommand\SelfUpdateCommand(),
+            'release' => new Command\ReleaseCommand(),
+            'hotfix' => new Command\HotfixCommand(),
+            'feature' => new Command\FeatureCommand(),
+            'init' => new Command\InitCommand(),
+            'self-update' => new Command\SelfUpdateCommand(),
+            'help' => new Command\HelpCommand(),
         ];
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isInGitRepo()
-    {
-        return is_dir(realpath(getcwd()) . '/.git/');
-    }
-
-    /**
-     */
-    protected function initConfig()
-    {
-        $createConfigFile = false;
-
-        $this->config = Config::create(getenv('HOME'), realpath(getcwd()));
-        $this->config->set('twgit.protected.revision', self::REVISION);
-
-        $sourceConfig = __DIR__ . '/../../app/config/config.yml.dist';
-        foreach (['global', 'project'] as $part) {
-
-            $configDir = sprintf($this->config->get(sprintf('twgit.protected.%s.root_dir', $part)));
-            $configFile = sprintf('%s/%s', $configDir, $this->config->get('twgit.protected.config_file'));
-
-            if ('project' === $part && !$this->isInGitRepo()) {
-                continue;
-            }
-
-            if (!is_dir($configDir)) {
-                mkdir($configDir, 0755);
-            }
-
-            if (!is_file($configFile)) {
-                copy($sourceConfig, $configFile);
-                $createConfigFile = true;
-                $this->logger->help(sprintf(
-                    'A %s config file has been created in "%s". Please configure it !',
-                    $part,
-                    $configFile
-                ));
-            }
-
-            $this->config->import($configFile);
-            $sourceConfig = $configFile;
-        }
-
-        if ($createConfigFile) {
-            exit(1);
-        }
-    }
-
-    /**
-     * @param string $command
-     *
-     * @return Command
-     */
-    protected function initCommand($command)
-    {
-        try {
-            $this->command = $this->get($command);
-        } catch (\Exception $ex) {
-            if (!empty($command)) {
-                $this->getLogger()->error(sprintf('Unknown command "%s".', $command));
-            }
-            $this->showUsage();
-            exit(1);
-        }
     }
 
     /**
@@ -176,36 +103,4 @@ class Application extends BaseApplication
 
         return $inputDefinition;
     }
-
-    /**
-     * {inheritdoc}
-     */
-    protected function showUsage()
-    {
-        $version = self::REVISION;
-
-        $this->logger->log('info', <<<EOT
-<cb>(i)</> <c>Usage:</>
-<wb>    twgit <command> [<action>]</>
-    Always provide branch names wthout any prefix (see config file).
-
-<cb>(i)</> <c>Availabe commands are:</>
-    <wb>release</>         Manage your release branches.
-    <wb>hotfix</>          Manage your hotfix branches.
-    <wb>feature</>         Manage your feature branches.
-    <wb>self-update</>     Update the version of twgit.
-
-<cb>(i) See also:</>
-    Try 'twgit command [help]' for more details
-
-<cb>(i) About:</>
-    Contact:            git@github.com:monsieurchico/php-twgit.git
-    Adapted from:       git@github.com:Twenga/twgit.git
-    Revision:           {$version}
-
-EOT
-        );
-    }
-
-
 }

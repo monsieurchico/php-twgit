@@ -67,6 +67,10 @@ class GithubConnector extends AbstractConnector
      */
     public function createProjectVersion($version)
     {
+        if (empty($version)) {
+            return true;
+        }
+
         $response = $this->getClient()->post(
             $this->getUrl(self::URL_TYPE_MILESTONES),
             array_merge(
@@ -84,7 +88,11 @@ class GithubConnector extends AbstractConnector
             )
         );
 
-        return self::HTTP_STATUS_OK === $response->getStatusCode();
+        if (self::HTTP_STATUS_OK !== $response->getStatusCode()) {
+            return null !== $this->getProjectVersionInfo($version);
+        }
+
+        return false;
     }
 
     /**

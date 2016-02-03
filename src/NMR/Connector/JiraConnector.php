@@ -49,10 +49,6 @@ class JiraConnector extends AbstractConnector
             return true;
         }
 
-        if ($this->getProjectVersion($version)) {
-            return true;
-        }
-
         $response = $this->getClient()->post(
             $this->getUrl(self::URL_TYPE_VERSIONS),
             array_merge(
@@ -67,7 +63,11 @@ class JiraConnector extends AbstractConnector
             )
         );
 
-        return self::HTTP_STATUS_OK === $response->getStatusCode();
+        if (self::HTTP_STATUS_OK !== $response->getStatusCode()) {
+            return null !== $this->getProjectVersion($version);
+        }
+
+        return false;
     }
 
     /**

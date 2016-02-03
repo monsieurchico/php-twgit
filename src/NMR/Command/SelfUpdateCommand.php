@@ -47,6 +47,14 @@ class SelfUpdateCommand extends Command
     /**
      * {inheritdoc}
      */
+    public function needTwgitRepository()
+    {
+        return false;
+    }
+
+    /**
+     * {inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $currentRevision = explode('-', $this->getConfig()->get('twgit.protected.revision'))[0];
@@ -112,11 +120,11 @@ class SelfUpdateCommand extends Command
     /**
      * {inheritdoc}
      */
-    protected function showUsage()
+    public function showUsage()
     {
         $prefixRelease = $this->getConfig()->get('twgit.workflow.prefixes.release');
 
-        $this->getLogger()->help(<<<EOT
+        $this->getLogger()->writeln(<<<EOT
 <cb>(i)</> <c>Usage</>
 <wb>    twgit self-update [-r|-c]</>
 EOT

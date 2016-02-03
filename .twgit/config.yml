@@ -13,4 +13,7 @@ parameters:
 
     connectors:
         enabled: 'github'
+        github:
+            repository: 'php-twgit'
+            user: 'monsieurchico'
 

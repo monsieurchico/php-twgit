@@ -3,11 +3,15 @@
 namespace NMR\Command;
 
 use Exception;
+use GuzzleHttp\Client;
+use NMR\Application;
 use NMR\Client\GuzzleHttpClientAwareTrait;
+use NMR\Config\Config;
 use NMR\Config\ConfigAwareTrait;
 use NMR\Connector\ConnectorFactory;
 use NMR\Exception\ConfigurationException;
 use NMR\Exception\WorkflowException;
+use NMR\Log\Logger;
 use NMR\Log\LoggerAwareTrait;
 use NMR\Shell\Git\Git;
 use NMR\Shell\Git\GitAwareTrait;
@@ -39,29 +43,17 @@ abstract class Command extends BaseCommand
     /** @var array */
     protected $actions;
 
-    /** @var AbstractWorkflow */
-    protected $workflow;
-
-    /**
-     * @param AbstractWorkflow $workflow
-     *
-     * @return Command
-     */
-    public function setWorkflow(AbstractWorkflow $workflow)
-    {
-        $this->workflow = $workflow;
-
-        return $this;
-    }
 
     /**
      */
-    abstract protected function showUsage();
+    abstract public function showUsage();
 
     /**
      * @return bool
      */
     abstract public function needGitRepository();
+
+    abstract public function needTwgitRepository();
 
     /**
      * {inheritdoc}
@@ -82,8 +74,28 @@ abstract class Command extends BaseCommand
     {
         parent::initialize($input, $output);
 
+        $this->initLogger($input, $output);
         $this->initGit($input);
         $this->initShell($input);
+        $this->initClient();
+
+        if ($this->needGitRepository() && !$this->git->isInGitRepo()) {
+            $this->getLogger()->error('This command must be executed in a git repository. Try the command "twgit init" to start a git repository');
+            $this->getApplication()->showUsage($this->logger);
+            exit(1);
+        }
+
+        // Need to be in a git repository to initialize configuration
+        $this->initConfig();
+
+        if ($this->needTwgitRepository() && !$this->isTwgitInitialized()) {
+            $this->getLogger()->error('Twgit is not initialzed. Please use "twgit init" command.');
+            $this->getApplication()->showUsage($this->logger);
+            exit(1);
+        }
+
+        // Twgit need to be configured before importing configuration files
+        $this->importConfig();
     }
 
     /**
@@ -91,24 +103,25 @@ abstract class Command extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->initWorkflow();
+        $workflow = $this->initWorkflow();
 
         try {
             $action = $this->getAction($input);
-            if (!method_exists($this->workflow, $action)) {
+            if (!method_exists($workflow, $action)) {
                 $this->showUsage();
                 exit(1);
             }
 
-            call_user_func_array([$this->workflow, $action], [$input]);
+            call_user_func_array([$workflow, $action], [$input]);
         } catch (Exception $ex) {
-            $this->getLogger()->error($ex->getMessage());
 
             if ($ex instanceOf ConfigurationException) {
                 $this->showUsage();
             } elseif ($ex instanceOf WorkflowException && $ex->getGitExitCommand()) {
                 $response = $this->getGit()->execCommand($ex->getGitExitCommand());
                 $this->getLogger()->writeln($response->getOutput());
+            } else {
+                throw $ex;
             }
 
             exit(1);
@@ -153,7 +166,7 @@ abstract class Command extends BaseCommand
             str_replace('Command', '', TextUtil::getNamespaceShortName($this))
         );
 
-        $this->workflow = (new $classname($this->config))
+        $workflow = (new $classname($this->config))
             ->setGit($this->git)
             ->setShell($this->shell)
             ->setLogger($this->logger);
@@ -163,10 +176,47 @@ abstract class Command extends BaseCommand
         if (!empty($type)) {
             $connectorFactory = new ConnectorFactory();
             $connector = $connectorFactory->create($type, $this->getConfig(), $this->getClient());
-            $this->workflow->setConnector($connector);
+            $workflow->setConnector($connector);
+        }
+
+        return $workflow;
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     */
+    protected function initLogger(InputInterface $input, OutputInterface $output)
+    {
+        $this->logger = new Logger($input, $output);
+    }
+
+    /**
+     * Init configuration object
+     */
+    protected function initConfig()
+    {
+        $this->config = Config::create(getenv('HOME'), $this->git->getProjectRootDir());
+        $this->config->set('twgit.protected.revision', Application::REVISION);
+    }
+
+    /**
+     * Import configuration files
+     * @throws ConfigurationException
+     */
+    protected function importConfig()
+    {
+        foreach (['global', 'project'] as $part) {
+            $configDir = sprintf($this->config->get(sprintf('twgit.protected.%s.config_dir', $part)));
+            $configFile = sprintf('%s/%s', $configDir, $this->config->get('twgit.protected.config_file'));
+            $this->config->import($configFile);
         }
     }
 
+    protected function initClient()
+    {
+        $this->client = new Client();
+    }
 
     /**
      * @param InputInterface $input
@@ -182,5 +232,16 @@ abstract class Command extends BaseCommand
     protected function initShell(InputInterface $input)
     {
         $this->shell = (new Shell($input->getOption('verbose')))->setLogger($this->logger);
+    }
+
+    /**
+     * Check if twgit is initialized by checking if config exists
+     * @throws WorkflowException
+     */
+    protected function isTwgitInitialized()
+    {
+        $configDir = sprintf($this->config->get('twgit.protected.project.config_dir'));
+        $configFile = sprintf('%s/%s', $configDir, $this->config->get('twgit.protected.config_file'));
+        return file_exists($configFile);
     }
 }

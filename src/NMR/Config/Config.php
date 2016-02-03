@@ -17,7 +17,7 @@ class Config
     /**
      * @param array $config
      */
-    public function __construct(array $config)
+    public function __construct(array $config = array())
     {
         $this->storage = $config;
     }
@@ -31,12 +31,12 @@ class Config
     public static function create($globalRootDir, $projectRootDir)
     {
         $configDir = '.twgit';
-        $globalRootDir .= '/' . $configDir;
-        $projectRootDir .= '/' . $configDir;
 
         return new self([
             'twgit.protected.global.root_dir' => $globalRootDir,
+            'twgit.protected.global.config_dir' => $globalRootDir . '/' . $configDir,
             'twgit.protected.project.root_dir' => $projectRootDir,
+            'twgit.protected.project.config_dir' => $projectRootDir . '/' . $configDir,
             'twgit.protected.config_file' => 'config.yml',
             'twgit.protected.global.versions_dir' => sprintf('%s/versions', $globalRootDir),
             'twgit.protected.global.cache_dir' => sprintf('%s/cache', $projectRootDir),
