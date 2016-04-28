@@ -2,6 +2,7 @@
 
 namespace NMR\Connector;
 use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class JiraConnector
@@ -37,7 +38,6 @@ class JiraConnector extends AbstractConnector
         $this->credentials = $credentials;
     }
 
-
     /**
      * @param string $version
      *
@@ -63,7 +63,7 @@ class JiraConnector extends AbstractConnector
             )
         );
 
-        if (self::HTTP_STATUS_OK !== $response->getStatusCode()) {
+        if ($this->isResponseOK($response)) {
             return null !== $this->getProjectVersion($version);
         }
 
@@ -82,7 +82,7 @@ class JiraConnector extends AbstractConnector
             $this->getDefaultClientOptions()
         );
 
-        if (self::HTTP_STATUS_OK === $response->getStatusCode()) {
+        if ($this->isResponseOK($response)) {
             $parameters = json_decode($response->getBody(), true);
 
             return $parameters['fields']['summary'];
@@ -102,7 +102,7 @@ class JiraConnector extends AbstractConnector
             $this->getDefaultClientOptions()
         );
 
-        if (self::HTTP_STATUS_OK === $response->getStatusCode()) {
+        if ($this->isResponseOK($response)) {
             return json_decode($response->getBody()->getContents(), true);
         }
 
@@ -163,9 +163,7 @@ class JiraConnector extends AbstractConnector
             )
         );
 
-        return
-            self::HTTP_STATUS_NO_CONTENT === $response->getStatusCode() ||
-            self::HTTP_STATUS_OK === $response->getStatusCode();
+        return $this->isResponseOK($response);
     }
 
     /**
@@ -203,5 +201,14 @@ class JiraConnector extends AbstractConnector
                 'application/json'
             ],
         ];
+    }
+
+    /**
+     * @param ResponseInterface $response
+     * @return bool
+     */
+    protected function isResponseOK(ResponseInterface $response)
+    {
+        return 1 === intval($response->getStatusCode() / self::HTTP_STATUS_OK);
     }
 }
