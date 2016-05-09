@@ -167,8 +167,8 @@ class HotfixWorkflow extends AbstractWorkflow
         $currentRelease = $this->getCurrentReleaseInProgress();
 
         if (!empty($currentRelease)) {
-            $this->getLogger()->warning(sprintf('Do not forget to merge "%s" tag into "%s" release before close it !' . "\n" .
-            'Try on release: git merge --no-ff' . $tag, $tag, $currentRelease));
+            $this->getLogger()->warning(sprintf('Do not forget to merge "%1$s" tag into "%2$s" release before close it !' . "\n" .
+            'Try on release: git merge --no-ff %1$s', $tag, $currentRelease));
         }
     }
 }
