@@ -8,7 +8,10 @@ git pull --rebase
 if [ $? -ne 0 ]; then
     exit -1;
 fi
-cp -R deploy /tmp 
+
+sh makefile.sh
+
+cp -R deploy /tmp
 if [ $? -ne 0 ]; then
     exit -1;
 fi
