@@ -107,6 +107,7 @@ class HelpCommand extends Command
     <wb>release</>         Manage your release branches.
     <wb>hotfix</>          Manage your hotfix branches.
     <wb>feature</>         Manage your feature branches.
+    <wb>demo</>            Manage your demo branches.
     <wb>self-update</>     Update the version of twgit.
 
     <wb>init <tagname> [<url>]</>
