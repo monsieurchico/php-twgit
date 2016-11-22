@@ -51,6 +51,8 @@ class Config
         return $this->storage;
     }
 
+
+
     /**
      * @param string $file
      *
@@ -60,7 +62,7 @@ class Config
     public function import($file)
     {
         if (!file_exists($file)) {
-            throw new ConfigurationException(sprintf('Configuration file "%s" does not exist.', $file));
+            throw new ConfigurationException(sprintf('Configuration file "%s" does not exist. Please run <b>init</b> command.', $file));
         }
 
         $yaml = Yaml::parse(file_get_contents($file));

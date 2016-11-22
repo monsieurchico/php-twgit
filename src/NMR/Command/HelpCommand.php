@@ -3,6 +3,7 @@
 namespace NMR\Command;
 
 use NMR\Application;
+use NMR\Config\Config;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class FeatureCommand
  */
-class HelpCommand extends Command
+class HelpCommand extends AbstractCommand
 {
     /** @var Command */
     protected $relatedCommand;
@@ -20,11 +21,19 @@ class HelpCommand extends Command
     protected $errorMessage;
 
     /**
+     * Init empty configuration
+     */
+    protected function initConfig()
+    {
+        $this->config = new Config();
+    }
+
+    /**
      * @param Command $relatedCommand
      *
      * @return HelpCommand
      */
-    public function setRelatedCommand(Command $relatedCommand = null)
+    public function setRelatedCommand(AbstractCommand $relatedCommand = null)
     {
         $this->relatedCommand = $relatedCommand;
 

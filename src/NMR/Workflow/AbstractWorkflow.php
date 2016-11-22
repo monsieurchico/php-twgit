@@ -538,9 +538,13 @@ EOT
         $this->assertValidRefName($version);
         $this->getLogger()->processing('Check valid tag name...');
 
-        if ('0.0.0' === $version || !preg_match('@^[\d]+\.[\d]+\.[\d]+$@', $version)) {
+        if (!preg_match('@^[\d]+\.[\d]+\.[\d]+$@', $version)) {
             throw new WorkflowException(sprintf(
                 'Unauthorized tag name: <error_bold>%s</>. Must use <major.minor.revision> format, e.g. "1.2.3".', $version
+            ));
+        } elseif ('0.0.0' === $version) {
+            throw new WorkflowException(sprintf(
+                'Forbidden tag name: <error_bold>%s</>. Must use <major.minor.revision> format, e.g. "1.2.3".', $version
             ));
         }
     }

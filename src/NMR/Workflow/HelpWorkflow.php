@@ -9,9 +9,9 @@ use NMR\Exception\WorkflowException;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
- * Class InitWorkflow
+ * Class HelpWorkflow
  */
-class InitWorkflow extends AbstractWorkflow
+class HelpWorkflow extends AbstractWorkflow
 {
 
     /**

@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 /**
  * Class ReleaseCommand
  */
-class ReleaseCommand extends Command
+class ReleaseCommand extends AbstractCommand
 {
     /**
      * {inheritdoc}

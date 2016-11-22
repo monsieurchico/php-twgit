@@ -43,10 +43,6 @@ class Application extends BaseApplication
      */
     public function __construct()
     {
-//        register_shutdown_function(function() {
-//            var_dump(error_get_last());
-//        });
-
         parent::__construct('Twgit', self::REVISION);
 
         $this->setDefaultCommand(self::DEFAULT_COMMAND);
@@ -61,20 +57,16 @@ class Application extends BaseApplication
             return parent::doRun($input, $output);
         } catch (\Exception $exc) {
             $name = $this->getCommandName($input);
+
             $relatedCommand = null;
             if ($this->has($name)) {
                 $relatedCommand = $this->get($name);
             }
 
-            /** @var NMRCommand\HelpCommand $command */
-            $command = $this->get(self::DEFAULT_COMMAND);
-            $command
-                ->setRelatedCommand($relatedCommand)
-                ->setErrorMessage($exc->getMessage());
+            /** @var NMRCommand\AbstractCommand $relatedCommand */
+            $relatedCommand->showUsage();
 
-            $exitCode = $this->doRunCommand($command, $input, $output);
-
-            return $exitCode;
+            return 0;
         }
     }
 

@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 /**
  * Class HotfixCommand
  */
-class HotfixCommand extends Command
+class HotfixCommand extends AbstractCommand
 {
     /**
      * {inheritdoc}
