@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class HelpCommand extends AbstractCommand
 {
-    /** @var Command */
+    /** @var AbstractCommand */
     protected $relatedCommand;
 
     /** @var string */
@@ -38,6 +38,16 @@ class HelpCommand extends AbstractCommand
         $this->relatedCommand = $relatedCommand;
 
         return $this;
+    }
+
+    /**
+     * @param AbstractCommand|null $relatedCommand
+     *
+     * @return HelpCommand
+     */
+    public function setCommand(AbstractCommand $command = null)
+    {
+        return $this->setRelatedCommand($command);
     }
 
     /**
@@ -75,6 +85,7 @@ class HelpCommand extends AbstractCommand
         }
 
         if (!empty($this->relatedCommand)) {
+            $this->relatedCommand->initialize($input, $output);
             $this->relatedCommand->showUsage();
         } else {
             $this->showUsage();
