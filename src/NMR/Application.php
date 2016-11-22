@@ -29,7 +29,7 @@ class Application extends BaseApplication
     use LoggerAwareTrait;
 
     const
-        REVISION = '0.1.0',
+        REVISION = 'twgit_revision',
         DEFAULT_COMMAND = 'help'
     ;
 
@@ -56,10 +56,7 @@ class Application extends BaseApplication
             $name = $this->getCommandName($input);
 
             $this->getLogger()->error('ERROR : ' . $exc->getMessage());
-
-            echo $exc->getTraceAsString();
-
-            $this->getLogger()->help('Run <b>twgit ' . $name . '</b> to display the help.');
+            $this->getLogger()->help('Run <b>twgit ' . $name . ' -h</b> to display the help.');
 
             return 0;
         }

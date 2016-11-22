@@ -31,14 +31,6 @@ class InitCommand extends AbstractCommand
     }
 
     /**
-     * Init empty configuration
-     */
-    protected function initConfig()
-    {
-        $this->config = new Config();
-    }
-
-    /**
      * {inheritdoc}
      */
     public function needGitRepository()
