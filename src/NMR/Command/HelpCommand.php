@@ -21,14 +21,6 @@ class HelpCommand extends AbstractCommand
     protected $errorMessage;
 
     /**
-     * Init empty configuration
-     */
-    protected function initConfig()
-    {
-        $this->config = new Config();
-    }
-
-    /**
      * @param Command $relatedCommand
      *
      * @return HelpCommand

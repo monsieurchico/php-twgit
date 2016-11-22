@@ -28,19 +28,28 @@ class Config
      *
      * @return Config
      */
-    public static function create($globalRootDir, $projectRootDir)
+    public static function create($globalRootDir, $projectRootDir = null)
     {
         $configDir = '.twgit';
 
-        return new self([
+        $project = [];
+        $global = [
             'twgit.protected.global.root_dir' => $globalRootDir,
             'twgit.protected.global.config_dir' => $globalRootDir . '/' . $configDir,
-            'twgit.protected.project.root_dir' => $projectRootDir,
-            'twgit.protected.project.config_dir' => $projectRootDir . '/' . $configDir,
+
             'twgit.protected.config_file' => 'config.yml',
             'twgit.protected.global.versions_dir' => sprintf('%s/versions', $globalRootDir),
             'twgit.protected.global.cache_dir' => sprintf('%s/cache', $projectRootDir),
-        ]);
+        ];
+
+        if ($projectRootDir) {
+            $project = [
+                'twgit.protected.project.root_dir' => $projectRootDir,
+                'twgit.protected.project.config_dir' => $projectRootDir . '/' . $configDir,
+            ];
+        }
+
+        return new self(array_merge($global, $project));
     }
 
     /**
@@ -50,8 +59,6 @@ class Config
     {
         return $this->storage;
     }
-
-
 
     /**
      * @param string $file

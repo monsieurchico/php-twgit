@@ -35,7 +35,6 @@ class InitWorkflow extends AbstractWorkflow
             $this->assertCleanWorkingTree();
         }
 
-        $this->assetTwgitNotAlreadyInitialized();
         $this->assertNewAndValidTagName($tagName);
 
         $this->logger->processing(sprintf('Check presence of remote "%s" repository...', $this->origin));
@@ -87,17 +86,6 @@ class InitWorkflow extends AbstractWorkflow
         $this->initGitignore();
 
         $this->createAndPushTag($this->getRefName($tagName, self::TAG), 'First tag.');
-    }
-
-    /**
-     * Check if twgit is already initialized by checking if config exists
-     * @throws WorkflowException
-     */
-    protected function assetTwgitNotAlreadyInitialized()
-    {
-        if ($this->isTwgitInitialized()) {
-            throw new WorkflowException('Twgit already initialized for this repository');
-        }
     }
 
     /**

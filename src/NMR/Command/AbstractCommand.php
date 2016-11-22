@@ -37,11 +37,10 @@ abstract class AbstractCommand extends BaseCommand
         GitAwareTrait,
         ConfigAwareTrait,
         GuzzleHttpClientAwareTrait
-        ;
+    ;
 
     /** @var array */
     protected $actions;
-
 
     /**
      */
@@ -78,7 +77,6 @@ abstract class AbstractCommand extends BaseCommand
 
         if ($this->needGitRepository() && !$this->git->isInGitRepo()) {
             $this->getLogger()->error('This command must be executed in a git repository. Try the command "twgit init" to start a git repository');
-            $this->getApplication()->showUsage($this->logger);
             exit(1);
         }
 
@@ -87,7 +85,6 @@ abstract class AbstractCommand extends BaseCommand
 
         if ($this->needTwgitRepository() && !$this->isTwgitInitialized()) {
             $this->getLogger()->error('Twgit is not initialzed. Please use "twgit init" command.');
-            $this->getApplication()->showUsage($this->logger);
             exit(1);
         }
     }
@@ -154,8 +151,6 @@ abstract class AbstractCommand extends BaseCommand
      */
     protected function initWorkflow()
     {
-        $this->initConfig();
-
         $classname = sprintf(
             'NMR\Workflow\%sWorkflow',
             str_replace('Command', '', TextUtil::getNamespaceShortName($this))
@@ -191,7 +186,12 @@ abstract class AbstractCommand extends BaseCommand
      */
     protected function initConfig()
     {
-        $this->config = Config::create(getenv('HOME'), $this->git->getProjectRootDir());
+        if ($this->git->isInGitRepo()) {
+            $this->config = Config::create(getenv('HOME'), $this->git->getProjectRootDir());
+        } else {
+            $this->config = Config::create(getenv('HOME'));
+        }
+
         $this->config->set('twgit.protected.revision', Application::REVISION);
 
         foreach (['global', 'project'] as $part) {
