@@ -26,15 +26,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Application extends BaseApplication
 {
-    use
-        LoggerAwareTrait,
-        ConfigAwareTrait,
-        GitAwareTrait,
-        ShellAwareTrait
-        ;
+    use LoggerAwareTrait;
 
     const
-        REVISION = 'twgit_revision',
+        REVISION = '0.1.0',
         DEFAULT_COMMAND = 'help'
     ;
 
@@ -54,17 +49,17 @@ class Application extends BaseApplication
     public function doRun(InputInterface $input = null, OutputInterface $output = null)
     {
         try {
+            $this->setLogger(new Logger($input, $output));
+
             return parent::doRun($input, $output);
         } catch (\Exception $exc) {
             $name = $this->getCommandName($input);
 
-            $relatedCommand = null;
-            if ($this->has($name)) {
-                $relatedCommand = $this->get($name);
-            }
+            $this->getLogger()->error('ERROR : ' . $exc->getMessage());
 
-            /** @var NMRCommand\AbstractCommand $relatedCommand */
-            $relatedCommand->showUsage();
+            echo $exc->getTraceAsString();
+
+            $this->getLogger()->help('Run <b>twgit ' . $name . '</b> to display the help.');
 
             return 0;
         }
