@@ -2,8 +2,10 @@
 
 namespace NMR\Command;
 
+use Exception;
 use NMR\Config\Config;
-use Symfony\Component\Console\Command\Command as BaseCommand;
+use NMR\Exception\ConfigurationException;
+use NMR\Exception\WorkflowException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class InitCommand
  */
-class InitCommand extends Command
+class InitCommand extends AbstractCommand
 {
     /**
      * {inheritdoc}
@@ -50,14 +52,6 @@ class InitCommand extends Command
     public function needTwgitRepository()
     {
         return false;
-    }
-
-    /**
-     * {inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $this->initWorkflow()->initAction($input);
     }
 
     /**

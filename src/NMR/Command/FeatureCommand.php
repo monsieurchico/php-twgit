@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 /**
  * Class FeatureCommand
  */
-class FeatureCommand extends Command
+class FeatureCommand extends AbstractCommand
 {
     /**
      * {inheritdoc}

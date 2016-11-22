@@ -13,7 +13,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Class SelfUpdateCommand
  */
-class SelfUpdateCommand extends Command
+class SelfUpdateCommand extends AbstractCommand
 {
     const
         REMOTE_URL_REVISION_INFO = 'http://monsieurchico.github.io/php-twgit/deploy/REVISION.md',

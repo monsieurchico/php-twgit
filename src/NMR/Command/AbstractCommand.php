@@ -18,7 +18,6 @@ use NMR\Shell\Git\GitAwareTrait;
 use NMR\Shell\Shell;
 use NMR\Shell\ShellAwareTrait;
 use NMR\Util\TextUtil;
-use NMR\Workflow\AbstractWorkflow;
 use Symfony\Component\Console\Command\Command as BaseCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,7 +29,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Romain Derocle <rderocle@gmail.com>
  */
-abstract class Command extends BaseCommand
+abstract class AbstractCommand extends BaseCommand
 {
     use
         LoggerAwareTrait,
@@ -72,8 +71,6 @@ abstract class Command extends BaseCommand
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        parent::initialize($input, $output);
-
         $this->initLogger($input, $output);
         $this->initGit($input);
         $this->initShell($input);
@@ -93,9 +90,6 @@ abstract class Command extends BaseCommand
             $this->getApplication()->showUsage($this->logger);
             exit(1);
         }
-
-        // Twgit need to be configured before importing configuration files
-        $this->importConfig();
     }
 
     /**
@@ -139,11 +133,10 @@ abstract class Command extends BaseCommand
      */
     protected function getAction(InputInterface $input)
     {
-        $action = $input->getArgument('action');
-
-        if (empty($action) || 'help' === $action) {
-            $this->showUsage();
-            exit(1);
+        if ($input->hasArgument('action')) {
+            $action = $input->getArgument('action');
+        } else {
+            $action = 'default';
         }
 
         return preg_replace_callback('/-(.?)/', function($matches) {
@@ -161,6 +154,8 @@ abstract class Command extends BaseCommand
      */
     protected function initWorkflow()
     {
+        $this->initConfig();
+
         $classname = sprintf(
             'NMR\Workflow\%sWorkflow',
             str_replace('Command', '', TextUtil::getNamespaceShortName($this))
@@ -198,21 +193,57 @@ abstract class Command extends BaseCommand
     {
         $this->config = Config::create(getenv('HOME'), $this->git->getProjectRootDir());
         $this->config->set('twgit.protected.revision', Application::REVISION);
-    }
 
-    /**
-     * Import configuration files
-     * @throws ConfigurationException
-     */
-    protected function importConfig()
-    {
         foreach (['global', 'project'] as $part) {
-            $configDir = sprintf($this->config->get(sprintf('twgit.protected.%s.config_dir', $part)));
-            $configFile = sprintf('%s/%s', $configDir, $this->config->get('twgit.protected.config_file'));
-            $this->config->import($configFile);
+            if ('project' === $part && !$this->git->isInGitRepo()) {
+                continue;
+            }
+
+            $this->initTwgitConfDir($part);
         }
     }
 
+    /**
+     * Initialize twit config directory
+     * @param $part
+     * @throws ConfigurationException
+     */
+    protected function initTwgitConfDir($part)
+    {
+        $sourceConfig = __DIR__ . '/../../../app/config/config.yml.dist';
+        $configDir = sprintf($this->config->get(sprintf('twgit.protected.%s.config_dir', $part)));
+        $configFile = sprintf('%s/%s', $configDir, $this->config->get('twgit.protected.config_file'));
+
+        if (!file_exists($configDir)) {
+            // Create new config directory
+            mkdir($configDir, 0755);
+            copy($sourceConfig, $configFile);
+            $this->logger->help(sprintf(
+                'A %s config file has been created in "%s". Please configure it !',
+                $part,
+                $configFile
+            ));
+        } elseif (is_file($configDir)) {
+            // Manage old .twgit file
+            rename($configDir, $configDir . '_old');
+            mkdir($configDir, 0755);
+            rename($configDir . '_old', $configDir . DIRECTORY_SEPARATOR . '.twgit_old');
+            copy($sourceConfig, $configFile);
+
+            $this->logger->help(sprintf(
+                'A %s config file has been created in "%s". Please configure it using your old configuration in "%s" !',
+                $part,
+                $configFile,
+                $configDir . DIRECTORY_SEPARATOR . '.twgit_old'
+            ));
+        }
+
+        $this->config->import($configFile);
+    }
+
+    /**
+     *
+     */
     protected function initClient()
     {
         $this->client = new Client();
@@ -236,12 +267,16 @@ abstract class Command extends BaseCommand
 
     /**
      * Check if twgit is initialized by checking if config exists
+     *
      * @throws WorkflowException
+     *
+     * @return bool
      */
     protected function isTwgitInitialized()
     {
         $configDir = sprintf($this->config->get('twgit.protected.project.config_dir'));
         $configFile = sprintf('%s/%s', $configDir, $this->config->get('twgit.protected.config_file'));
+
         return file_exists($configFile);
     }
 }
