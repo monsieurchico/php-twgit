@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.14.0] - 2016-11-21
+### Fixed
+- Remove the use of grep, sed and other shell commands in git command
+
 ## [0.13.2] - 2016-05-10
 ### Fixed
 - Fix missing space for git merge --no-ff and make use of ordered placeholder

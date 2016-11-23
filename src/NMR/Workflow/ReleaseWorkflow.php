@@ -121,12 +121,19 @@ class ReleaseWorkflow extends AbstractWorkflow
             $this->processFetch();
         }
 
-        $releases = $this->execGitCommand([
+        $response = $this->execGitCommand([
             'branch --no-color -r --merged', sprintf('%s/%s', $this->origin, $this->stable),
-            '|', sprintf('grep "%s/%s"', $this->origin, self::RELEASE),
-            '|', "sed 's/^[* ]*//'",
-            '|', sprintf("sed 's/%s\\///g'", $this->origin)
-        ], true)->getOutput();
+        ], false);
+
+        $relases = [];
+        if (!$response->getReturnCode()) {
+            foreach ($response->getOutput() as $line) {
+                $line = trim($line, ' *');
+                if (false !== strpos($line, sprintf('%s/%s', $this->origin, self::RELEASE))) {
+                    $relases[] = str_replace($this->origin . '/', '', $line);
+                }
+            }
+        }
 
         if (!empty($releases)) {
             $this->getLogger()->help(sprintf('Remote releases merged into <help_detail>%s</>:', $this->stable));
@@ -179,6 +186,7 @@ class ReleaseWorkflow extends AbstractWorkflow
         }
 
         $currentRelease = $this->getCurrentReleaseInProgress();
+
         if (empty($currentRelease)) {
             throw new WorkflowException('No release in progress.');
         }

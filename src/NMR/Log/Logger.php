@@ -31,7 +31,6 @@ class Logger
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
-     * @param Table           $table
      */
     public function __construct(InputInterface $input, OutputInterface $output)
     {
@@ -134,7 +133,7 @@ class Logger
             ->setHeaders($headers)
             ->setRows($data);
 
-        $this->table->render();
+        $this->tableHelper->render();
     }
 
     /**
