@@ -109,7 +109,7 @@ abstract class AbstractWorkflow
     {
         if (empty($this->userRepositoryRootDir)) {
             $this->userRepositoryRootDir = $this->execGitCommand([
-                'git rev-parse --show-toplevel 2>/dev/null'
+                'git rev-parse --show-toplevel'
             ], true)->getOutputLastLine();
         }
 
@@ -839,7 +839,7 @@ EOT
             ], true)->getOutput();
         }
 
-        foreach ($list as $index => $branch) {
+        foreach ($list as $index => & $branch) {
             $branch = trim($branch, ' *');
 
             if (!preg_match(sprintf("@^%s/%s@", $this->origin, $this->getRefNamePrefix(self::FEATURE)), $branch)) {
