@@ -108,9 +108,15 @@ abstract class AbstractCommand extends BaseCommand
 
             if ($ex instanceOf ConfigurationException) {
                 $this->showUsage();
-            } elseif ($ex instanceOf WorkflowException && $ex->getGitExitCommand()) {
-                $response = $this->getGit()->execCommand($ex->getGitExitCommand());
-                $this->getLogger()->writeln($response->getOutput());
+            } elseif ($ex instanceOf WorkflowException) {
+
+                $this->getLogger()->error($ex->getMessage());
+
+                if ($ex->getGitExitCommand()) {
+                    $response = $this->getGit()->execCommand($ex->getGitExitCommand());
+                    $this->getLogger()->writeln($response->getOutput());
+                }
+
             } else {
                 throw $ex;
             }

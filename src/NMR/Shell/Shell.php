@@ -65,7 +65,7 @@ class Shell implements ExecutableInterface
             $this->getLogger()->log('code', trim(sprintf('%s %s', $this->getPrompt(), $command)));
         }
 
-        $lastLine = exec($command, $output, $res);
+        $lastLine = exec(sprintf('(%s) 2>&1', $command), $output, $res);
 
         if (!is_array($output)) {
             $output = [];

@@ -351,16 +351,20 @@ abstract class AbstractWorkflow
     {
         $response = $this->execGitCommand([
             'git branch --no-color',
-            '|', "grep '^\\* '",
-            '|', "grep -v 'no branch'",
-            '|', "sed 's/^* //g'"
         ], true);
 
         if ($response->getReturnCode()) {
-            throw new WorkflowException('Failed to get current branche.');
+            throw new WorkflowException('Failed to get current branch.');
         }
 
-        return $response->getOutputLastLine();
+        foreach($response->getOutput() as $line) {
+            $line = trim($line, ' ');
+            if (preg_match('@^\* @', $line, $matches)) {
+                return trim($line, ' *');
+            }
+        }
+
+        throw new WorkflowException('Failed to get current branch.');
     }
 
     /**
@@ -419,7 +423,7 @@ abstract class AbstractWorkflow
 
         foreach ($allTags as $tag) {
             $tag = $this->getRefName($tag, self::TAG);
-            $tagRev = $this->execGitCommand(['rev-list', 'tags/' . $tag, '|', 'head -n 1'], true)->getOutputLastLine();
+            $tagRev = current($this->execGitCommand(['rev-list', 'tags/' . $tag], true)->getOutput());
             $mergeBase = $this->execGitCommand(['merge-base', $releaseRev, $tagRev], true)->getOutputLastLine();
 
             if ($tagRev !== $mergeBase) {
@@ -439,7 +443,7 @@ abstract class AbstractWorkflow
     {
         $this->getLogger()->processing('Check valid ref name...');
         $this->execGitCommand(
-            ['check-ref-format --branch', sprintf('"%s"', $branch), '1>/dev/null 2>&1'],
+            ['check-ref-format --branch', sprintf('"%s"', $branch)],
             true,
             sprintf('<error_bold>%s</> is not a valid reference name! See <error_bold>git check-ref-format</> for more details.', $branch)
         );
@@ -451,11 +455,11 @@ abstract class AbstractWorkflow
     protected function assertCleanWorkingTree()
     {
         $this->getLogger()->processing('Check clean working tree...');
-        $result = intval($this
-            ->execGitCommand(['status --porcelain --ignore-submodules=all', '|', 'wc -l'], true)
-            ->getOutputLastLine());
+        $result = $this
+            ->execGitCommand(['status --porcelain --ignore-submodules=all'], true)
+            ->getOutputLastLine();
 
-        if ($result) {
+        if (!empty($result)) {
             throw new WorkflowException(
                 'Untracked files or changes to be committed in your working tree.',
                 'git status'
@@ -660,9 +664,18 @@ EOT
      */
     protected function hasOriginRepository()
     {
-        return '0' !== $this->execGitCommand([
-                sprintf('remote | grep -E "^%s$" | wc -l', $this->origin)
-            ], true)->getOutputLastLine();
+        $response = $this->execGitCommand(['remote'], true);
+
+        if (!$response->getReturnCode()) {
+            foreach ($response->getOutput() as $line) {
+                $line = trim($line);
+                if ($this->origin === $line) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -769,11 +782,11 @@ EOT
     {
         $contributors = [];
         foreach ($this->execGitCommand([
-            'shortlog -nse', sprintf('%s/%s..%s', $this->origin, $this->stable, $branch),
-            '|', "sed 's/^[* ]*//'"
-        ], true)->getOutput() as $data) {
+            'shortlog -nse', sprintf('%s/%s..%s', $this->origin, $this->stable, $branch)
+        ], true)->getOutput() as $line) {
+            $line = trim($line);
 
-            list($commits, $author) = explode("\t", $data);
+            list($commits, $author) = explode("\t", $line);
             $contributors[intval($commits)] = $author;
         }
 
@@ -815,71 +828,26 @@ EOT
         if (empty($type) && empty($release)) {
             $list = $this->execGitCommand([
                 'branch --no-color -r',
-                '|', "sed 's/^[* ]*//'",
             ], true)->getOutput();
         } elseif ('merged' === $type && !empty($release)) {
             $list = $this->execGitCommand([
-                'branch --no-color -r --merged', $release, '2>/dev/null',
-                '|', "sed 's/^[* ]*//'",
+                'branch --no-color -r --merged', $release,
             ], true)->getOutput();
         } elseif (empty($release)) {
             $list = $this->execGitCommand([
-                'branch --no-color -r --no-merged', sprintf('%s/%s', $this->origin, $this->stable), '2>/dev/null',
-                '|', "sed 's/^[* ]*//'",
+                'branch --no-color -r --no-merged', sprintf('%s/%s', $this->origin, $this->stable),
             ], true)->getOutput();
         }
 
         foreach ($list as $index => $branch) {
+            $branch = trim($branch, ' *');
+
             if (!preg_match(sprintf("@^%s/%s@", $this->origin, $this->getRefNamePrefix(self::FEATURE)), $branch)) {
                 unset($list[$index]);
             }
         }
 
         return array_values($list);
-
-#        $features
-
-//        release="$TWGIT_ORIGIN/$release"
-//        local return_features=''
-//
-//        local features=$(git branch --no-color -r | grep "$TWGIT_ORIGIN/$TWGIT_PREFIX_FEATURE" | sort --field-separator="-" -k1rn -k2rn | sed 's/^[* ]*//')
-//
-//        get_git_rev_parse "$TWGIT_ORIGIN/$TWGIT_STABLE"
-//        local head_rev="${REV_PARSE[$TWGIT_ORIGIN/$TWGIT_STABLE]}"
-//
-//        get_git_rev_parse $release
-//        local release_rev="${REV_PARSE[$release]}"
-//
-//        local f_rev release_merge_base stable_merge_base check_merge has_dependency
-//
-//        get_git_merged_branches $release
-//        local merged_branches="${MERGED_BRANCHES[$release]}"
-//
-//        for f in $features; do
-//            get_git_rev_parse $f
-//            f_rev="${REV_PARSE[$f]}"
-//
-//            get_git_merge_base $release_rev $f_rev 1
-//            release_merge_base="${MERGE_BASE[$release_rev|$f_rev]}"
-//
-//            if [ "$release_merge_base" = "$f_rev" ] && [ -n "$(echo "$merged_branches" | grep $f)" ]; then
-//                [ "$feature_type" = 'merged' ] && return_features="$return_features $f"
-//            else
-//                get_git_merge_base $release_merge_base $head_rev
-//                stable_merge_base="${MERGE_BASE[$release_merge_base|$head_rev]}"
-//
-//                if [ "$release_merge_base" != "$stable_merge_base" ] && \
-//                    [ "$(git rev-list $f_rev ^$release_merge_base ^$stable_merge_base --parents --first-parent | cut -d' ' -f2 | grep $release_merge_base | wc -l)" -eq 1 ]; then
-//                    [ "$feature_type" = 'merged_in_progress' ] && return_features="$return_features $f"
-//                elif [ "$feature_type" = 'free' ]; then
-//                    return_features="$return_features $f"
-//                fi
-//            fi
-//        done
-//
-//        GET_FEATURES_RETURN_VALUE="${return_features:1}"
-//    fi
-//}
     }
 
     /**
@@ -941,7 +909,7 @@ EOT
                 $this->getLogger()->info('*', false);
             }
             $stableOrigin = $this->execGitCommand([
-                'describe --abbrev=0', $branch, '2>/dev/null'
+                'describe --abbrev=0', $branch,
             ], true)->getOutputLastLine();
 
             if (!empty($stableOrigin)) {
@@ -955,11 +923,12 @@ EOT
 
             $this->alertOldBranch($branch);
 
-            $this->getLogger()->info($this->execGitCommand([
-                'show', $branch, '--pretty=medium',
-                '|', "grep -v '^Merge: '",
-                '|', 'head -n 3'
-            ], true)->getOutputAsString());
+            foreach (array_slice($this->execGitCommand(['show', $branch, '--pretty=medium'])->getOutput(), 0, 4) as $line) {
+                $line = trim($line);
+                if (!empty($line) && 0 !== strpos($line, 'Merge:')) {
+                    $this->getLogger()->info($line);
+                }
+            }
         }
     }
 
@@ -1216,13 +1185,15 @@ EOT
 
     /**
      * Check if twgit is initialized by checking if config exists
-     * @throws WorkflowException
+     *
+     * @return bool
      */
     protected function isTwgitInitialized()
     {
         $this->config = Config::create(getenv('HOME'), $this->git->getProjectRootDir());
         $configDir = sprintf($this->config->get(sprintf('twgit.protected.project.config_dir')));
         $configFile = sprintf('%s/%s', $configDir, $this->config->get('twgit.protected.config_file'));
+
         return file_exists($configFile);
     }
 }
