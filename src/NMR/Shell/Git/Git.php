@@ -344,7 +344,7 @@ class Git extends Shell
 
         if (!isset($this->isInsideWorkTree)) {
             $this->isInsideWorkTree = ('true' === $this->execCommand(
-                    $this->buildCommand(['rev-parse', '--is-inside-work-tree', '2> /dev/null']),
+                    $this->buildCommand(['rev-parse', '--is-inside-work-tree']),
                     '',
                     true,
                     false
@@ -360,7 +360,7 @@ class Git extends Shell
     public function getProjectRootDir()
     {
         if (!isset($this->projectRootDir)) {
-            $this->projectRootDir = realpath($this->revParse('--git-dir', array()) . DIRECTORY_SEPARATOR . '..');
+            $this->projectRootDir = realpath($this->revParse('--git-dir', []) . DIRECTORY_SEPARATOR . '..');
         }
         return $this->projectRootDir;
     }

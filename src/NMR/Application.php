@@ -55,8 +55,10 @@ class Application extends BaseApplication
         } catch (\Exception $exc) {
             $name = $this->getCommandName($input);
 
-            $this->getLogger()->error('ERROR : ' . $exc->getMessage());
-            $this->getLogger()->help('Run <b>twgit ' . $name . ' -h</b> to display the help.');
+            if ($exc->getMessage()) {
+                $this->getLogger()->error('ERROR : ' . $exc->getMessage());
+                $this->getLogger()->help('Run <b>twgit ' . $name . ' -h</b> to display the help.');
+            }
 
             return 0;
         }
