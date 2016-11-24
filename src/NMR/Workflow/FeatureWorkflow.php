@@ -48,7 +48,6 @@ class FeatureWorkflow extends AbstractWorkflow
         }
 
         $feature = $input->getArgument('name');
-        $interactive = !$input->getOption('silent');
 
         if (empty($feature)) {
 
@@ -56,12 +55,6 @@ class FeatureWorkflow extends AbstractWorkflow
 
             if (!$this->isType($feature, self::FEATURE)) {
                 throw new WorkflowException('You must be in a feature if you didn\'t specify one.');
-            } else {
-                if ($interactive) {
-                    if (!$this->getLogger()->ask(sprintf('Are you sure to merge "%s" into "%s" ?', $feature, $release))) {
-                        throw new WorkflowException('Merge into current release aborted.');
-                    }
-                }
             }
         } else {
             $feature = $this->getRefName($this->cleanPrefix($feature, self::FEATURE), self::FEATURE);
@@ -107,7 +100,7 @@ class FeatureWorkflow extends AbstractWorkflow
         if (preg_match(sprintf('@^%s|%s|%s$@', self::RELEASE, self::HOTFIX, self::DEMO), $type)) {
             $commands[] = [
                 'shell' => $this->getShell(),
-                'command' => sprintf('twgit %s start', $type)
+                'command' => sprintf('twgit %s start --silent', $type)
             ];
         } else {
             throw new WorkflowException(sprintf(

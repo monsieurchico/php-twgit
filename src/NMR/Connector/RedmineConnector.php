@@ -26,6 +26,14 @@ class RedmineConnector extends AbstractConnector
     }
 
     /**
+     * @return string
+     */
+    function getName()
+    {
+        return 'redmine';
+    }
+
+    /**
      * @param $issue
      *
      * @return string

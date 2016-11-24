@@ -10,6 +10,11 @@ namespace NMR\Connector;
 interface ConnectableInterface
 {
     /**
+     * @return string
+     */
+    function getName();
+
+    /**
      * @param string $version
      *
      * @return mixed

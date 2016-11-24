@@ -60,13 +60,12 @@ class Shell implements ExecutableInterface
     public function execCommand($command, $errorMessage = null, $silent = false, $abortOnError = true)
     {
         trim($command);
-        $command = sprintf('(%s) 2>&1', $command);
 
         if (!$silent || $this->verbose) {
             $this->getLogger()->log('code', trim(sprintf('%s %s', $this->getPrompt(), $command)));
         }
 
-        $lastLine = exec($command, $output, $res);
+        $lastLine = exec(sprintf('(%s) 2>&1', $command), $output, $res);
 
         if (!is_array($output)) {
             $output = [];

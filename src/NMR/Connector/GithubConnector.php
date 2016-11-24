@@ -38,6 +38,14 @@ class GithubConnector extends AbstractConnector
     }
 
     /**
+     * @return string
+     */
+    function getName()
+    {
+        return 'github';
+    }
+
+    /**
      * @param string $version
      *
      * @return array|null

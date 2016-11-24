@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.14.2] - 2016-11-24
+### Fixed
+- Fix twgit feature merge-into-release failing
+
 ## [0.14.0] - 2016-11-21
 ### Fixed
 - Remove the use of grep, sed and other shell commands in git command
