@@ -38,4 +38,12 @@ class NullConnector extends AbstractConnector
     {
         return true;
     }
+
+    /**
+     * @return string
+     */
+    function getName()
+    {
+        return 'null';
+    }
 }

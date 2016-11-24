@@ -26,6 +26,14 @@ class GitlabConnector extends AbstractConnector
     }
 
     /**
+     * @return string
+     */
+    function getName()
+    {
+        return 'gitlab';
+    }
+
+    /**
      * @param $issue
      *
      * @return string

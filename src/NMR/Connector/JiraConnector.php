@@ -39,6 +39,14 @@ class JiraConnector extends AbstractConnector
     }
 
     /**
+     * @return string
+     */
+    function getName()
+    {
+        return 'jira';
+    }
+
+    /**
      * @param string $version
      *
      * @return bool

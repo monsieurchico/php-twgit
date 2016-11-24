@@ -31,6 +31,14 @@ class TrelloConnector extends AbstractConnector
     }
 
     /**
+     * @return string
+     */
+    function getName()
+    {
+        return 'trello';
+    }
+
+    /**
      * @param $issue
      *
      * @return string

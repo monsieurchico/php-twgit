@@ -1174,7 +1174,11 @@ EOT
      */
     protected function createProjectVersion($version)
     {
-        $this->getLogger()->processing(sprintf('Create project version "%s"...', $version), false);
+        $this->getLogger()->processing(sprintf(
+            'Create version "%s" in %s project"...',
+            $version,
+            ucfirst(strtolower($this->getConnector()->getName()))
+        ), false);
 
         if ($this->getConnector()->createProjectVersion($version)) {
             $this->getLogger()->log('g', 'OK');
