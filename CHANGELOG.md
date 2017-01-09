@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.15.0] - 2017-01-09
+### Fixed
+- Do a 'git pull' when merge a feature into release
+
 ## [0.14.2] - 2016-11-24
 ### Fixed
 - Fix twgit feature merge-into-release failing
