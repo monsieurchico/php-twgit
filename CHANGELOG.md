@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.15.0] - 2017-01-09
+## [0.15.1] - 2017-01-09
 ### Fixed
 - Do a 'git pull' when merge a feature into release
 
