@@ -110,6 +110,11 @@ class FeatureWorkflow extends AbstractWorkflow
 
         $commands[] = [
             'git' => $this->getShell(),
+            'command' => $this->getGit()->buildCommand(['pull origin HEAD'])
+        ];
+
+        $commands[] = [
+            'git' => $this->getShell(),
             'command' => $this->getGit()->buildCommand(['merge --no-ff', $feature])
         ];
 
