@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.15.2] - 2017-02-11
+### Fixed
+- Tag prefix not used on branch creation
+
 ## [0.15.1] - 2017-01-09
 ### Fixed
 - Do a 'git pull' when merge a feature into release
