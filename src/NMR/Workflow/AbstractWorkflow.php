@@ -422,7 +422,6 @@ abstract class AbstractWorkflow
         $allTags = $this->getGit()->getTags();
 
         foreach ($allTags as $tag) {
-            $tag = $this->getRefName($tag, self::TAG);
             $tagRev = current($this->execGitCommand(['rev-list', 'tags/' . $tag], true)->getOutput());
             $mergeBase = $this->execGitCommand(['merge-base', $releaseRev, $tagRev], true)->getOutputLastLine();
 
@@ -529,7 +528,7 @@ EOT
 
         $this->getLogger()->help(sprintf('Last tag: %s', $lastTag));
 
-        return $this->getRefName($lastTag, self::TAG);
+        return $lastTag;
     }
 
     /**

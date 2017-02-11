@@ -45,7 +45,7 @@ class Git extends Shell
     }
 
     /**
-     * @return string
+     * @return mixed
      */
     public function getLastTag()
     {
@@ -94,7 +94,6 @@ class Git extends Shell
 
     /**
      * @return array
-     * @throws ShellException
      */
     public function getTags()
     {
@@ -102,8 +101,8 @@ class Git extends Shell
         $response = $this->execSilentCommand('tag');
 
         foreach ($response->getOutput() as $t) {
-            $tag = $this->sanitizeTagName($t);
-            $tags[$this->convertTagToInt($tag)] = $tag;
+            $sanitizedTag = $this->sanitizeTagName($t);
+            $tags[$this->convertTagToInt($sanitizedTag)] = $t;
         }
 
         ksort($tags);
