@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.16.0] - 2017-02-13
+### Added
+- Add auto update mechanism
+
 ## [0.15.2] - 2017-02-11
 ### Fixed
 - Tag prefix not used on branch creation

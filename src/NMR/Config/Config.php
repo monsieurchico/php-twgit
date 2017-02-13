@@ -143,4 +143,12 @@ class Config
 
         return $this;
     }
+
+    /**
+     * @return array
+     */
+    public function all()
+    {
+        return $this->storage;
+    }
 }
