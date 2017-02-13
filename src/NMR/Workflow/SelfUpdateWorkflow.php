@@ -43,9 +43,9 @@ class SelfUpdateWorkflow extends AbstractWorkflow
     public function defaultAction(InputInterface $input)
     {
         if ($input->hasOption('rollback')) {
-            $this->rollback();
+            $this->getLogger()->info('Not implemented yet.');
         } elseif ($input->hasOption('clean-old-versions')) {
-            $this->cleanOldVersions();
+            $this->getLogger()->info('Not implemented yet.');
         } else {
             $this->handleUpgrade();
         }
@@ -57,9 +57,6 @@ class SelfUpdateWorkflow extends AbstractWorkflow
     protected function handleUpgrade()
     {
         $currentRevision = explode('-', $this->getConfig()->get('twgit.protected.revision'))[0];
-
-        $currentRevision = '0.15.1';
-
         $distantRevision = explode('-', str_replace("\n", '', file_get_contents(self::REMOTE_URL_REVISION_INFO . '?c=' . uniqid())))[0];
 
         $this->getLogger()->help(sprintf(
@@ -87,7 +84,7 @@ class SelfUpdateWorkflow extends AbstractWorkflow
     {
         $fs = new Filesystem();
 
-        $versionDir = sprintf('%s/versions', $this->getConfig()->get('twgit.protected.global.root_dir'));
+        $versionDir = sprintf('%s/versions', $this->getConfig()->get('twgit.protected.global.config_dir'));
         if (!is_dir($versionDir)) {
             mkdir($versionDir, 0755);
         }
@@ -120,7 +117,7 @@ class SelfUpdateWorkflow extends AbstractWorkflow
 
         file_put_contents(sprintf(
             '%s%s%s',
-            $this->getConfig()->get('twgit.protected.global.project_dir'),
+            $this->getConfig()->get('twgit.protected.global.config_dir'),
             DIRECTORY_SEPARATOR,
             $this->getConfig()->get('twgit.update.log_filename')
         ), date('Y-m-d H:i:s'));

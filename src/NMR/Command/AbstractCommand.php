@@ -103,7 +103,7 @@ abstract class AbstractCommand extends BaseCommand
 
             $lastUpdateFile = sprintf(
                 '%s%s%s',
-                $this->getConfig()->get('twgit.protected.global.project_dir'),
+                $this->getConfig()->get('twgit.protected.global.config_dir'),
                 DIRECTORY_SEPARATOR,
                 $this->getConfig()->get('twgit.update.log_filename')
             );
