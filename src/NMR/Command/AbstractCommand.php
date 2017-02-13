@@ -113,6 +113,13 @@ abstract class AbstractCommand extends BaseCommand
                 if (!empty($content)) {
                     $lastUpdate = file_get_contents($lastUpdateFile);
                 }
+            } else {
+                file_put_contents(sprintf(
+                    '%s%s%s',
+                    $this->getConfig()->get('twgit.protected.global.config_dir'),
+                    DIRECTORY_SEPARATOR,
+                    $this->getConfig()->get('twgit.update.log_filename')
+                ), date('Y-m-d H:i:s'));
             }
 
             if (empty($lastUpdate)) {
