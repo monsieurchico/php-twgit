@@ -87,7 +87,7 @@ class SelfUpdateWorkflow extends AbstractWorkflow
     {
         $fs = new Filesystem();
 
-        $versionDir = sprintf('%s/versions', $this->config->get('twgit.protected.global.root_dir'));
+        $versionDir = sprintf('%s/versions', $this->getConfig()->get('twgit.protected.global.root_dir'));
         if (!is_dir($versionDir)) {
             mkdir($versionDir, 0755);
         }
@@ -120,7 +120,7 @@ class SelfUpdateWorkflow extends AbstractWorkflow
 
         file_put_contents(sprintf(
             '%s%s%s',
-            $this->getConfig()->get('twgit.protected.project.config_dir'),
+            $this->getConfig()->get('twgit.protected.global.project_dir'),
             DIRECTORY_SEPARATOR,
             $this->getConfig()->get('twgit.update.log_filename')
         ), date('Y-m-d H:i:s'));
