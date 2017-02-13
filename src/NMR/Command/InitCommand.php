@@ -2,14 +2,8 @@
 
 namespace NMR\Command;
 
-use Exception;
-use NMR\Config\Config;
-use NMR\Exception\ConfigurationException;
-use NMR\Exception\WorkflowException;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class InitCommand

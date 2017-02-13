@@ -90,14 +90,65 @@ abstract class AbstractCommand extends BaseCommand
     }
 
     /**
+     * @return array
+     */
+    protected function checkAutoUpdate()
+    {
+        $command = null;
+        $action = null;
+
+        if ($this->getConfig()->get('twgit.update.auto_check')) {
+
+            $checkUpdatePeriod = (int)$this->getConfig()->get('twgit.update.nb_days');
+
+            $lastUpdateFile = sprintf(
+                '%s%s%s',
+                $this->getConfig()->get('twgit.protected.project.config_dir'),
+                DIRECTORY_SEPARATOR,
+                $this->getConfig()->get('twgit.update.log_filename')
+            );
+
+            if (file_exists($lastUpdateFile)) {
+                $content = file_get_contents($lastUpdateFile);
+                if (!empty($content)) {
+                    $lastUpdate = file_get_contents($lastUpdateFile);
+                }
+            }
+
+            if (empty($lastUpdate)) {
+                $lastUpdate = sprintf('now - %d days', $checkUpdatePeriod + 1);
+            }
+
+            $lastUpdate = new \DateTime($lastUpdate);
+
+            $days = (new \DateTime('now'))->diff($lastUpdate)->format('%a');
+
+            if ($days >  $checkUpdatePeriod) {
+
+                $this->getLogger()->info('Your application has not been updated since ' . $lastUpdate->format('Y-m-d H:i:s'));
+
+                $command = 'SelfUpdateCommand';
+                $action = 'defaultAction';
+            }
+        }
+
+        return [$command, $action];
+    }
+
+    /**
      * {inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $workflow = $this->initWorkflow();
+        list($command, $action) = $this->checkAutoUpdate();
+
+        $workflow = $this->initWorkflow($command);
 
         try {
-            $action = $this->getAction($input);
+            if (!$action) {
+                $action = $this->getAction($input);
+            }
+
             if (!method_exists($workflow, $action)) {
                 $this->showUsage();
                 exit(1);
@@ -148,18 +199,14 @@ abstract class AbstractCommand extends BaseCommand
     }
 
     /**
-     * @param Config $config
-     * @param Git    $git
-     * @param Shell  $shell
-     * @param Logger $logger
-     *
-     * @throws ConfigurationException
+     * @param null $overrideCommand
+     * @return mixed
      */
-    protected function initWorkflow()
+    protected function initWorkflow($overrideCommand = null)
     {
         $classname = sprintf(
             'NMR\Workflow\%sWorkflow',
-            str_replace('Command', '', TextUtil::getNamespaceShortName($this))
+            str_replace('Command', '', TextUtil::getNamespaceShortName($overrideCommand ?: $this))
         );
 
         $workflow = (new $classname($this->config))
