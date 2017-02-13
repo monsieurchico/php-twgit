@@ -2,7 +2,6 @@
 
 namespace NMR\Command;
 
-use Symfony\Component\Console\Command\Command as BaseCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 

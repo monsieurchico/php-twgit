@@ -28,7 +28,7 @@ abstract class AbstractWorkflow
         GitAwareTrait,
         ShellAwareTrait,
         ConnectorAwareTrait
-        ;
+    ;
 
     const
         NAME = "command",
