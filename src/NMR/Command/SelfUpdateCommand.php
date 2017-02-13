@@ -44,11 +44,9 @@ class SelfUpdateCommand extends AbstractCommand
      */
     public function showUsage()
     {
-        $prefixRelease = $this->getConfig()->get('twgit.workflow.prefixes.release');
-
         $this->getLogger()->writeln(<<<EOT
 <cb>(i)</> <c>Usage</>
-<wb>    twgit self-update [-r|-c]</>
+<wb>    twgit self-update</>
 EOT
         );
     }
