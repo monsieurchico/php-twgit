@@ -1,10 +1,9 @@
 # Changelog
 
-## [0.16.1] - 2017-02-13
+## [0.16.3] - 2017-02-13
 ### Fixed
 - Typo
 
-## [0.16.0] - 2017-02-13
 ### Added
 - Add auto update mechanism
 
