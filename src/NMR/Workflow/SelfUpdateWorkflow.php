@@ -74,6 +74,13 @@ class SelfUpdateWorkflow extends AbstractWorkflow
                 $this->upgrade($currentRevision, $distantRevision);
                 break;
         }
+
+        file_put_contents(sprintf(
+            '%s%s%s',
+            $this->getConfig()->get('twgit.protected.global.config_dir'),
+            DIRECTORY_SEPARATOR,
+            $this->getConfig()->get('twgit.update.log_filename')
+        ), date('Y-m-d H:i:s'));
     }
 
     /**
