@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.17.0] - 2017-03-06
+### Fixed
+- Check update but not execute command (#46)
+
 ## [0.16.5] - 2017-02-16
 ### Fixed
 - Typo
