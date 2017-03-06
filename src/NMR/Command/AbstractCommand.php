@@ -123,7 +123,7 @@ abstract class AbstractCommand extends BaseCommand
             }
 
             if (empty($lastUpdate)) {
-                $lastUpdate = sprintf('now - %d days', $checkUpdatePeriod + 1);
+                $lastUpdate = sprintf('now');
             }
 
             $lastUpdate = new \DateTime($lastUpdate);
@@ -131,11 +131,8 @@ abstract class AbstractCommand extends BaseCommand
             $days = (new \DateTime('now'))->diff($lastUpdate)->format('%a');
 
             if ($days >  $checkUpdatePeriod) {
-
                 $this->getLogger()->info('Your application has not been updated since ' . $lastUpdate->format('Y-m-d H:i:s'));
-
-                $command = 'SelfUpdateCommand';
-                $action = 'defaultAction';
+                $this->getLogger()->info('Check if a new version exists with self-update command');
             }
         }
 
