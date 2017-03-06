@@ -147,7 +147,32 @@ EOT;
     Adapted from:       git@github.com:Twenga/twgit.git
     Revision:           {$version}
 EOT;
-            $this->getLogger()->info($message);
+
+        if ($this->getConfig()->get('twgit.update.auto_check')) {
+          $checkUpdatePeriod = (int)$this->getConfig()->get('twgit.update.nb_days');
+          $lastUpdateFile = sprintf(
+              '%s%s%s',
+              $this->getConfig()->get('twgit.protected.global.config_dir'),
+              DIRECTORY_SEPARATOR,
+              $this->getConfig()->get('twgit.update.log_filename')
+          );
+
+          $lastUpdate = null;
+          if (file_exists($lastUpdateFile)) {
+              $content = file_get_contents($lastUpdateFile);
+              if (!empty($content)) {
+                  $lastUpdate = new \DateTime(file_get_contents($lastUpdateFile));
+                  $newUpdate = clone $lastUpdate;
+                  $newUpdate->modify($checkUpdatePeriod . ' days');
+                  $message .= "\n" . <<<EOT
+    Last update:        {$lastUpdate->format('Y-m-d H:i:s')}
+    Adapted from:       {$newUpdate->format('Y-m-d H:i:s')}
+EOT;
+              }
+          }
+        }
+
+        $this->getLogger()->info($message);
     }
 
 }
