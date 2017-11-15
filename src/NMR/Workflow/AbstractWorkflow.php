@@ -235,7 +235,7 @@ abstract class AbstractWorkflow
         $lastCommitBranch1 = $this->getGit()->revParse($branch1);
         $lastCommitBranch2 = $this->getGit()->revParse($branch2);
 
-        if ($lastCommitBranch1 === $lastCommitBranch2) {
+        if ($lastCommitBranch1 !== $lastCommitBranch2) {
             $response = $this->execGitCommand([
                 sprintf('merge-base "%s" "%s"', $lastCommitBranch1, $lastCommitBranch2)
             ], true);
