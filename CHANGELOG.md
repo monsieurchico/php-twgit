@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.17.2] - 2017-11-15
+### Updated
+- Update to php7.1
+
+## [0.17.1] - 2017-11-15
+### Fixed
+- Fix compare branches function
+
 ## [0.17.0] - 2017-03-06
 ### Fixed
 - Check update but not execute command (#46)
