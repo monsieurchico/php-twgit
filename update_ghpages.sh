@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+set -euo pipefail
 
 git checkout master
 if [ $? -ne 0 ]; then
